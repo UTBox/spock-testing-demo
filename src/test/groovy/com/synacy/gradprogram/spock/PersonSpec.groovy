@@ -27,7 +27,7 @@ class PersonSpec extends Specification {
         then:
         person.getName() == "MrKrabs"
     }
-    def "getAge should return the age of the initialized person in class Person() {
+    def "getAge should return the age of the initialized person in class Person"() {
         given:
         Address address = Mock()
 
@@ -114,5 +114,4 @@ class PersonSpec extends Specification {
                 ", Address: (" + address.toString() + ")" +
                 ", Sex: " + person.sex
     }
-
 }

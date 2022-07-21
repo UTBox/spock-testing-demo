@@ -41,10 +41,10 @@ class AddressSpec extends Specification {
         given:
         def phAddress = new Address("PH", "Cebu", "Escario")
         when:
-        phAddress.setCountry("Talisay")
+        phAddress.setCity("Talisay")
 
         then:
-        phAddress.getCountry() == "Cebu"
+        phAddress.getCity() == "Talisay"
 
     }
 
@@ -83,7 +83,5 @@ class AddressSpec extends Specification {
         message == "Country: " + phAddress.country +
                 ", City: " + phAddress.city +
                 ", Street: " + phAddress.street
-
-
     }
 }
