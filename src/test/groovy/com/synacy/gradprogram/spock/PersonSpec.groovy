@@ -1,17 +1,21 @@
 package com.synacy.gradprogram.spock
 
+import com.mechanitis.demo.spock.Colour
 import spock.lang.Specification
 
 class PersonSpec extends Specification {
-//    def "test getName"() {
-//        given:
-//
-//        when:
-//        // TODO implement stimulus
-//        then:
-//        // TODO implement assertions
-//    }
-//
+
+    def "test getName"() {
+        given:
+        Person person = Mock()
+        Sex sex = Mock()
+
+        person.setName() >>
+        when:
+
+
+        then:
+
 //    def "test setName"() {
 //        given:
 //
