@@ -50,7 +50,7 @@ class ExampleSpecification extends Specification {
         sides << [0, 1, 2]
     }
 
-    @Unroll
+    @Unroll // seperates tests into their own test.
     def "should demonstrate simple data driven testing. Number of sides: #expected"() {
         expect:
         shape.getNumberOfSides() == expected
@@ -86,7 +86,7 @@ class ExampleSpecification extends Specification {
 
     def "should be able to use a stub"() {
         given:
-        Palette palette = Stub()
+        Palette palette = Stub() //instantation
         palette.getPrimaryColour() >> Colour.Red
         @Subject
         def renderer = new Renderer(palette)
