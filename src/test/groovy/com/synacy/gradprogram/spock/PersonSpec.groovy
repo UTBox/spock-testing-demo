@@ -99,13 +99,16 @@ class PersonSpec extends Specification {
         then:
         Sex.FEMALE == person.sex
     }
-//
-//    def "test toString"() {
-//        given:
-//
-//        when:
-//        // TODO implement stimulus
-//        then:
-//        // TODO implement assertions
-//    }
+
+    def "test toString"() {
+        given:
+        def address = Mock(Address)
+        Person person = new Person ("Kim",22,address,Sex.MALE)
+
+        when:
+        person.toString()
+
+        then:
+        "Name: " + person.name + ", Age: " + person.age + ", Address: (" + address.toString() + ")" + ", Sex: " + person.sex == person.toString()
+    }
 }
