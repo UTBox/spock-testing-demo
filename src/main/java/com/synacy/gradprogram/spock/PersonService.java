@@ -12,19 +12,20 @@ public class PersonService {
         this.eventPublisher = eventPublisher;
     }
 
-    public void addPerson(String name, int age, Address address, Sex sex) {
-        Person person = new Person(name, age, address, sex);
-
-        personRepository.save(person);
-
-        eventPublisher.publishMessage("Saved person >> " + person);
-    }
-
     public void deletePerson(UUID id) {
         Person person = personRepository.findById(id);
 
         personRepository.delete(person);
 
-        eventPublisher.publishMessage("Deleted person >> " + person);
+//        eventPublisher.publishMessage("Deleted person >> " + person);
     }
+
+    public void updatePersonName(UUID id, String newName) {
+        Person person = personRepository.findById(id);
+
+        person.setName(newName);
+
+        personRepository.save(person);
+    }
+
 }
