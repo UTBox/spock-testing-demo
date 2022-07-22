@@ -3,23 +3,28 @@ package com.synacy.gradprogram.spock
 import spock.lang.Specification
 
 class AddressSpec extends Specification {
-//    def "test getCountry"() {
-//        given:
-//
-//        when:
-//        // TODO implement stimulus
-//        then:
-//        // TODO implement assertions
-//    }
-//
-//    def "test setCountry"() {
-//        given:
-//
-//        when:
-//        // TODO implement stimulus
-//        then:
-//        // TODO implement assertions
-//    }
+
+    def "getCountry should return the country of Address."() {
+        given:
+        Address address = new Address("Philippines", "Cebu", "Mabolo")
+
+        when:
+        String result = address.getCountry()
+
+        then:
+        "Philippines" == result
+    }
+
+    def "test setCountry"() {
+        given:
+        Address address = new Address("China", "Cebu", "2nd street")
+
+        when:
+        address.setCountry("India")
+
+        then:
+        "Philippines" == address.country
+    }
 //
 //    def "test getCity"() {
 //        given:

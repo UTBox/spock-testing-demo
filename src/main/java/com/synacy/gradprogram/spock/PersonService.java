@@ -25,6 +25,14 @@ public class PersonService {
 
         personRepository.delete(person);
 
-        eventPublisher.publishMessage("Deleted person >> " + person);
+//        eventPublisher.publishMessage("Deleted person >> " + person);
+    }
+
+    public void updatePersonName(UUID id, String newName) {
+        Person person = personRepository.findById(id);
+
+        person.setName(newName);
+
+        personRepository.save(person);
     }
 }
