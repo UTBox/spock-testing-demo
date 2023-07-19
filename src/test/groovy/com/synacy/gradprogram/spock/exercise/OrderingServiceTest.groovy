@@ -92,4 +92,29 @@ class OrderingServiceTest extends Specification {
         then:
         !eligibleForDiscount
     }
+
+    def "applyDiscountToCartItems should set cost of each item in cart to 10 percent of original"() {
+        given:
+        Item itemForDiscount1 = new Item("cookie", 200.0, ItemType.FOOD)
+        Item itemForDiscount2 = new Item("phone", 1000.0, ItemType.GADGET)
+        Item itemForDiscount3 = new Item("blender", 5000.0, ItemType.APPLIANCE)
+        Item itemForDiscount4 = new Item("jacket", 500.0, ItemType.CLOTHING)
+        Item itemForDiscount5 = new Item("biscuit", 20.0, ItemType.FOOD)
+        Item itemForDiscount6 = new Item("iphone", 10000.0, ItemType.GADGET)
+        List itemListForDiscount = [itemForDiscount1, itemForDiscount2, itemForDiscount3,
+                                    itemForDiscount4, itemForDiscount5, itemForDiscount6]
+        List expectedCostOfItems = [20.0, 100.0, 500.0, 50.0, 2.0, 1000.0]
+        List actualCostOfItems = []
+
+        Cart cartForDiscount = new Cart(UUID.randomUUID(), itemListForDiscount)
+
+        when:
+        orderingService.applyDiscountToCartItems(cartForDiscount);
+        for (Item discountedItem in cartForDiscount.getItems()){
+            actualCostOfItems.add(discountedItem.getCost())
+        }
+
+        then:
+        expectedCostOfItems == actualCostOfItems
+    }
 }
