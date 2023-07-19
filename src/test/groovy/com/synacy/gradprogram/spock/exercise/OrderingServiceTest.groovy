@@ -6,15 +6,15 @@ class OrderingServiceTest extends Specification {
 
     OrderingService orderingService
 
-    Item foodItem1 = new Item("bread", 10.0, ItemType.FOOD)
-    Item applianceItem1 = new Item("toaster", 500.0, ItemType.APPLIANCE)
-    Item clothingItem1 = new Item("shirt", 200.0, ItemType.CLOTHING)
-    Item gadgetItem1 = new Item("phone", 1000.0, ItemType.GADGET)
+    Item foodItem = new Item("bread", 10.0, ItemType.FOOD)
+    Item applianceItem = new Item("toaster", 500.0, ItemType.APPLIANCE)
+    Item clothingItem = new Item("shirt", 200.0, ItemType.CLOTHING)
+    Item gadgetItem = new Item("phone", 1000.0, ItemType.GADGET)
 
-    Item foodItem2 = new Item("small bread", 1.0, ItemType.FOOD)
-    Item applianceItem2 = new Item("small toaster", 5.0, ItemType.APPLIANCE)
-    Item clothingItem2 = new Item("small shirt", 2.0, ItemType.CLOTHING)
-    Item gadgetItem2 = new Item("small phone", 10.0, ItemType.GADGET)
+    Item foodItemLowCost = new Item("small bread", 1.0, ItemType.FOOD)
+    Item applianceItemLowCost = new Item("small toaster", 5.0, ItemType.APPLIANCE)
+    Item clothingItemLowCost = new Item("small shirt", 2.0, ItemType.CLOTHING)
+    Item gadgetItemLowCost = new Item("small phone", 10.0, ItemType.GADGET)
 
     def setup(){
         orderingService = new OrderingService()
@@ -22,7 +22,7 @@ class OrderingServiceTest extends Specification {
 
     def "cartContainsFoodItem should return true if Cart has Item with type FOOD"() {
         given:
-        List itemListWithEachType = [foodItem1, applianceItem1, clothingItem1, gadgetItem1]
+        List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
         Cart cartWithEachItemType = new Cart(UUID.randomUUID(), itemListWithEachType)
 
         when:
@@ -34,7 +34,7 @@ class OrderingServiceTest extends Specification {
 
     def "cartContainsFoodItem should return false if Cart has no Item with type FOOD"() {
         given:
-        List itemListWithoutFood = [applianceItem1, clothingItem1, gadgetItem1]
+        List itemListWithoutFood = [applianceItem, clothingItem, gadgetItem]
         Cart cartWithoutFoodItem = new Cart(UUID.randomUUID(), itemListWithoutFood)
 
         when:
@@ -46,7 +46,7 @@ class OrderingServiceTest extends Specification {
 
     def "calculateTotalCostOfCart should return the sum of the cost of each item in cart"() {
         given:
-        List itemListWithEachType = [foodItem1, applianceItem1, clothingItem1, gadgetItem1]
+        List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
         Cart cartWithEachItemType = new Cart(UUID.randomUUID(), itemListWithEachType)
         double expectedTotalCost = 1710.0
 
