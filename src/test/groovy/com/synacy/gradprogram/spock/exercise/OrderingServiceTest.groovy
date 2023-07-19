@@ -16,6 +16,7 @@ class OrderingServiceTest extends Specification {
     Item clothingItemLowCost = new Item("small shirt", 2.0, ItemType.CLOTHING)
     Item gadgetItemLowCost = new Item("small phone", 10.0, ItemType.GADGET)
 
+
     def setup(){
         orderingService = new OrderingService()
     }
@@ -116,5 +117,84 @@ class OrderingServiceTest extends Specification {
 
         then:
         expectedCostOfItems == actualCostOfItems
+    }
+
+    def "createAnOrder should throw UnableToCreateOrderException if canContainFood is false and cart contains food"() {
+        given:
+        List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
+        Cart cartForOrder = new Cart(UUID.randomUUID(), itemListWithEachType)
+        def canContainFood = false
+
+        when:
+        Order order = orderingService.createAnOrder(cartForOrder, "recipientName",
+                "recipientAddress", canContainFood)
+
+        then:
+        thrown(UnableToCreateOrderException)
+    }
+
+    def "createAnOrder should respond with an object Order with recipient name"() {
+        given:
+        List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
+        Cart cartForOrder = new Cart(UUID.randomUUID(), itemListWithEachType)
+        def canContainFood = true
+        def expectedName = "recipientName"
+        def expectedAddress = "recipientAddress"
+
+        when:
+        Order order = orderingService.createAnOrder(cartForOrder, expectedName, expectedAddress, canContainFood)
+        def actualName = order.getRecipientName()
+
+        then:
+        expectedName == actualName
+    }
+
+    def "createAnOrder should respond with an object Order with recipient address"() {
+        given:
+        List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
+        Cart cartForOrder = new Cart(UUID.randomUUID(), itemListWithEachType)
+        def canContainFood = true
+        def expectedName = "recipientName"
+        def expectedAddress = "recipientAddress"
+
+        when:
+        Order order = orderingService.createAnOrder(cartForOrder, expectedName, expectedAddress, canContainFood)
+        def actualAddress = order.getRecipientAddress()
+
+        then:
+        expectedAddress == actualAddress
+    }
+
+    def "createAnOrder should respond with an object Order with total cost"() {
+        given:
+        List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
+        Cart cartForOrder = new Cart(UUID.randomUUID(), itemListWithEachType)
+        def canContainFood = true
+        def expectedName = "recipientName"
+        def expectedAddress = "recipientAddress"
+        def expectedTotalCost = 1710.0
+
+        when:
+        Order order = orderingService.createAnOrder(cartForOrder, expectedName, expectedAddress, canContainFood)
+        def actualTotalCost = order.getTotalCost()
+
+        then:
+        expectedTotalCost == actualTotalCost
+    }
+
+    def "createAnOrder should respond with an object Order with order status as pending"() {
+        given:
+        List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
+        Cart cartForOrder = new Cart(UUID.randomUUID(), itemListWithEachType)
+        def canContainFood = true
+        def expectedName = "recipientName"
+        def expectedAddress = "recipientAddress"
+        def expectedTotalCost = 1710.0
+
+        when:
+        Order order = orderingService.createAnOrder(cartForOrder, expectedName, expectedAddress, canContainFood)
+
+        then:
+        order.getStatus() == OrderStatus.PENDING
     }
 }
