@@ -65,7 +65,7 @@ class OrderingServiceSpec extends Specification {
 
     def "should apply discount to cart items when the cart is eligible for discount"() {
         given:
-        def cart = new Cart(UUID.randomUUID(), items)
+        cart = new Cart(UUID.randomUUID(), items)
         List<Double> initialCosts = cart.getItems().collect() { it.getCost() }
 
         when:
@@ -77,9 +77,23 @@ class OrderingServiceSpec extends Specification {
         updatedCosts.every() { it < (initialCosts[5]) }
     }
 
+    def "should not apply discount to cart items when the cart is not eligible for discount"() {
+        given:
+        cart = new Cart(UUID.randomUUID(), items)
+        List<Double> initialCosts = cart.getItems().collect() { it.getCost() }
+
+        when:
+        service.applyDiscountToCartItems(cart)
+        List<Double>  updatedCosts = cart.getItems().collect() { it.getCost() }
+
+        then:
+        updatedCosts.size() == initialCosts.size()
+    }
+
+
     def "should create an order with correct details when cart is valid and contain food"() {
         given:
-        def cart = new Cart(UUID.randomUUID(), items)
+        cart = new Cart(UUID.randomUUID(), items)
         String recipientName = "Romeo"
         String recipientAddress = "Cebu City"
         boolean canContainFood = true
@@ -96,7 +110,7 @@ class OrderingServiceSpec extends Specification {
 
     def "should throw and exception when cart contains food items and canContainFood is false"() {
         given:
-        def cart = new Cart(UUID.randomUUID(), items)
+        cart = new Cart(UUID.randomUUID(), items)
         String recipientName = "Romeo"
         String recipientAddress = "Cebu City"
         boolean canContainFood = false
