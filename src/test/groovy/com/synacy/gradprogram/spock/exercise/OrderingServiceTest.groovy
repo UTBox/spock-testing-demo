@@ -56,4 +56,40 @@ class OrderingServiceTest extends Specification {
         then:
         expectedTotalCost == actualTotalCost
     }
+
+    def "isCartEligibleForDiscount should return true if total cost of cart is greater than 50.0 and items in cart is greater than 5"() {
+        given:
+        List itemListForDiscount = [foodItem, applianceItem, clothingItem, gadgetItem, foodItemLowCost, applianceItemLowCost, gadgetItemLowCost]
+        Cart cartForDiscount = new Cart(UUID.randomUUID(), itemListForDiscount)
+
+        when:
+        boolean eligibleForDiscount = orderingService.isCartEligibleForDiscount(cartForDiscount)
+
+        then:
+        eligibleForDiscount
+    }
+
+    def "isCartEligibleForDiscount should return false if total cost of cart is less than 50.0"() {
+        given:
+        List itemListWithLowCostManyItems = [foodItem, foodItemLowCost, clothingItemLowCost, applianceItemLowCost, gadgetItemLowCost, foodItemLowCost, foodItemLowCost]
+        Cart cartWithLowCostManyItems = new Cart(UUID.randomUUID(), itemListWithLowCostManyItems)
+
+        when:
+        boolean eligibleForDiscount = orderingService.isCartEligibleForDiscount(cartWithLowCostManyItems)
+
+        then:
+        !eligibleForDiscount
+    }
+
+    def "isCartEligibleForDiscount should return false if items in cart is less than 5"() {
+        given:
+        List itemListWithHighCostFewItems = [gadgetItem, applianceItem]
+        Cart cartWithHighCostFewItems = new Cart(UUID.randomUUID(), itemListWithHighCostFewItems)
+
+        when:
+        boolean eligibleForDiscount = orderingService.isCartEligibleForDiscount(cartWithHighCostFewItems)
+
+        then:
+        !eligibleForDiscount
+    }
 }
