@@ -74,7 +74,9 @@ class OrderingServiceSpec extends Specification {
 
         then:
         updatedCosts.size() == initialCosts.size()
-        updatedCosts.every() { it < (initialCosts[5]) }
+        boolean isEligible = updatedCosts.every() { it < (initialCosts[5]) }
+        isEligible
+
     }
 
     def "should not apply discount to cart items when the cart is not eligible for discount"() {
