@@ -41,12 +41,8 @@ class OrderingServiceSpec extends Specification {
     }
 
     def "should demonstrate the total cost of cart"() {
-        given:
-        Item item = new Item ("Rice", 50.00, ItemType.FOOD)
-
         when:
         double totalPrice = service.calculateTotalCostOfCart(cart = new Cart(UUID.randomUUID(), items))
-        totalPrice =+ item.getCost()
 
         then:
         totalPrice
@@ -67,16 +63,18 @@ class OrderingServiceSpec extends Specification {
         given:
         cart = new Cart(UUID.randomUUID(), items)
         List<Double> initialCosts = cart.getItems().collect() { it.getCost() }
+        //double initialCosts = service.calculateTotalCostOfCart(cart)
 
         when:
         service.applyDiscountToCartItems(cart)
+        //boolean isEligible = service.isCartEligibleForDiscount(cart)
         List<Double>  updatedCosts = cart.getItems().collect() { it.getCost() }
 
         then:
+//        isEligible
+//        def updatedCosts = service.isCartEligibleForDiscount(service.applyDiscountToCartItems(cart))
         updatedCosts.size() == initialCosts.size()
-        boolean isEligible = updatedCosts.every() { it < (initialCosts[5]) }
-        isEligible
-
+        updatedCosts.every() { it < (initialCosts[5]) }
     }
 
     def "should not apply discount to cart items when the cart is not eligible for discount"() {
