@@ -25,24 +25,26 @@ class OrderingServiceTest extends Specification {
         given:
         List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
         Cart cartWithEachItemType = new Cart(UUID.randomUUID(), itemListWithEachType)
+        boolean hasFoodItemExpected = true
 
         when:
-        boolean containsFoodItem = orderingService.cartContainsFoodItem(cartWithEachItemType)
+        boolean hasFoodItemActual = orderingService.cartContainsFoodItem(cartWithEachItemType)
 
         then:
-        containsFoodItem
+        hasFoodItemExpected == hasFoodItemActual
     }
 
     def "cartContainsFoodItem should return false if Cart has no Item with type FOOD"() {
         given:
         List itemListWithoutFood = [applianceItem, clothingItem, gadgetItem]
         Cart cartWithoutFoodItem = new Cart(UUID.randomUUID(), itemListWithoutFood)
+        boolean hasFoodItemExpected = false
 
         when:
-        boolean containsFoodItem = orderingService.cartContainsFoodItem(cartWithoutFoodItem)
+        boolean hasFoodItemActual = orderingService.cartContainsFoodItem(cartWithoutFoodItem)
 
         then:
-        !containsFoodItem
+        hasFoodItemExpected == hasFoodItemActual
     }
 
     def "calculateTotalCostOfCart should return the sum of the cost of each item in cart"() {
@@ -62,36 +64,39 @@ class OrderingServiceTest extends Specification {
         given:
         List itemListForDiscount = [foodItem, applianceItem, clothingItem, gadgetItem, foodItemLowCost, applianceItemLowCost, gadgetItemLowCost]
         Cart cartForDiscount = new Cart(UUID.randomUUID(), itemListForDiscount)
+        boolean eligibleForDiscountExpected = true
 
         when:
-        boolean eligibleForDiscount = orderingService.isCartEligibleForDiscount(cartForDiscount)
+        boolean eligibleForDiscountActual = orderingService.isCartEligibleForDiscount(cartForDiscount)
 
         then:
-        eligibleForDiscount
+        eligibleForDiscountExpected == eligibleForDiscountActual
     }
 
     def "isCartEligibleForDiscount should return false if total cost of cart is less than 50.0"() {
         given:
         List itemListWithLowCostManyItems = [foodItem, foodItemLowCost, clothingItemLowCost, applianceItemLowCost, gadgetItemLowCost, foodItemLowCost, foodItemLowCost]
         Cart cartWithLowCostManyItems = new Cart(UUID.randomUUID(), itemListWithLowCostManyItems)
+        boolean eligibleForDiscountExpected = false
 
         when:
-        boolean eligibleForDiscount = orderingService.isCartEligibleForDiscount(cartWithLowCostManyItems)
+        boolean eligibleForDiscountActual = orderingService.isCartEligibleForDiscount(cartWithLowCostManyItems)
 
         then:
-        !eligibleForDiscount
+        eligibleForDiscountExpected == eligibleForDiscountActual
     }
 
     def "isCartEligibleForDiscount should return false if items in cart is less than 5"() {
         given:
         List itemListWithHighCostFewItems = [gadgetItem, applianceItem]
         Cart cartWithHighCostFewItems = new Cart(UUID.randomUUID(), itemListWithHighCostFewItems)
+        boolean eligibleForDiscountExpected = false
 
         when:
-        boolean eligibleForDiscount = orderingService.isCartEligibleForDiscount(cartWithHighCostFewItems)
+        boolean eligibleForDiscountActual = orderingService.isCartEligibleForDiscount(cartWithHighCostFewItems)
 
         then:
-        !eligibleForDiscount
+        eligibleForDiscountExpected == eligibleForDiscountActual
     }
 
     def "applyDiscountToCartItems should set cost of each item in cart to 10 percent of original"() {
