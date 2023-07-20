@@ -5,6 +5,7 @@ import spock.lang.Specification
 class OrderingServiceTest extends Specification {
 
     OrderingService orderingService
+    OrderRepository orderRepository
 
     Item foodItem = new Item("bread", 10.0, ItemType.FOOD)
     Item applianceItem = new Item("toaster", 500.0, ItemType.APPLIANCE)
@@ -17,8 +18,9 @@ class OrderingServiceTest extends Specification {
     Item gadgetItemLowCost = new Item("small phone", 10.0, ItemType.GADGET)
 
 
-    def setup(){
-        orderingService = new OrderingService()
+    def setup() {
+        orderRepository = new OrderRepository()
+        orderingService = new OrderingService(orderRepository)
     }
 
     def "cartContainsFoodItem should return true if Cart has Item with type FOOD"() {
@@ -116,7 +118,7 @@ class OrderingServiceTest extends Specification {
 
         when:
         orderingService.applyDiscountToCartItems(cartForDiscount);
-        for (Item discountedItem in cartForDiscount.getItems()){
+        for (Item discountedItem in cartForDiscount.getItems()) {
             actualCostOfItems.add(discountedItem.getCost())
         }
 
@@ -138,39 +140,7 @@ class OrderingServiceTest extends Specification {
         thrown(UnableToCreateOrderException)
     }
 
-    def "createAnOrder should respond with an object Order with recipient name"() {
-        given:
-        List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
-        Cart cartForOrder = new Cart(UUID.randomUUID(), itemListWithEachType)
-        def canContainFood = true
-        def expectedName = "recipientName"
-        def expectedAddress = "recipientAddress"
-
-        when:
-        Order order = orderingService.createAnOrder(cartForOrder, expectedName, expectedAddress, canContainFood)
-        def actualName = order.getRecipientName()
-
-        then:
-        expectedName == actualName
-    }
-
-    def "createAnOrder should respond with an object Order with recipient address"() {
-        given:
-        List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
-        Cart cartForOrder = new Cart(UUID.randomUUID(), itemListWithEachType)
-        def canContainFood = true
-        def expectedName = "recipientName"
-        def expectedAddress = "recipientAddress"
-
-        when:
-        Order order = orderingService.createAnOrder(cartForOrder, expectedName, expectedAddress, canContainFood)
-        def actualAddress = order.getRecipientAddress()
-
-        then:
-        expectedAddress == actualAddress
-    }
-
-    def "createAnOrder should respond with an object Order with total cost"() {
+    def "createAnOrder should respond with an object Order with correct values"() {
         given:
         List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
         Cart cartForOrder = new Cart(UUID.randomUUID(), itemListWithEachType)
@@ -181,24 +151,11 @@ class OrderingServiceTest extends Specification {
 
         when:
         Order order = orderingService.createAnOrder(cartForOrder, expectedName, expectedAddress, canContainFood)
-        def actualTotalCost = order.getTotalCost()
 
         then:
-        expectedTotalCost == actualTotalCost
-    }
-
-    def "createAnOrder should respond with an object Order with order status as pending"() {
-        given:
-        List itemListWithEachType = [foodItem, applianceItem, clothingItem, gadgetItem]
-        Cart cartForOrder = new Cart(UUID.randomUUID(), itemListWithEachType)
-        def canContainFood = true
-        def expectedName = "recipientName"
-        def expectedAddress = "recipientAddress"
-
-        when:
-        Order order = orderingService.createAnOrder(cartForOrder, expectedName, expectedAddress, canContainFood)
-
-        then:
-        order.getStatus() == OrderStatus.PENDING
+        expectedName == order.getRecipientName()
+        expectedAddress == order.getRecipientAddress()
+        expectedTotalCost == order.getTotalCost()
+        OrderStatus.PENDING == order.getStatus()
     }
 }
