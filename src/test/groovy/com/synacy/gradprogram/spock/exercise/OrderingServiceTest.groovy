@@ -172,7 +172,7 @@ class OrderingServiceTest extends Specification {
         def canContainFood = true
         def expectedName = "recipientName"
         def expectedAddress = "recipientAddress"
-        def expectedTotalCost = 1710.0
+        double expectedTotalCost = 1710.0
 
         when:
         Order order = orderingService.createAnOrder(cartForOrder, expectedName, expectedAddress, canContainFood)
@@ -189,7 +189,6 @@ class OrderingServiceTest extends Specification {
         def canContainFood = true
         def expectedName = "recipientName"
         def expectedAddress = "recipientAddress"
-        def expectedTotalCost = 1710.0
 
         when:
         Order order = orderingService.createAnOrder(cartForOrder, expectedName, expectedAddress, canContainFood)
