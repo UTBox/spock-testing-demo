@@ -1,67 +1,156 @@
 //file:noinspection GroovyAssignabilityCheck
 package com.mechanitis.demo.spock
 
-import com.synacy.gradprogram.spock.exercise.*
-//import com.synacy.gradprogram.spock.exercise.OrderingService
 import spock.lang.Specification
+import spock.lang.Subject
 import spock.lang.Unroll
 
 class ExampleSpecification extends Specification {
 
-    OrderingService service
+    @Subject
+    Polygon theTestSubject = new Polygon(56)
 
-    def setup() {
-
-        service = new OrderingService()
+    def "should demonstrate a simple assertion"() {
+        expect:
+        1 == 1
     }
 
     // can use just when-then if there's no setup
-    def "cartContainsFoodItem should verify if the cart has food items."() {
+    def "should demonstrate given-when-then"() {
         given:
-        Item nuggets = new Item("Nuggets", 185, ItemType.FOOD)
-        Item ham = new Item("Ham", 198, ItemType.FOOD)
-        Item ipad = new Item("iPad", 29990, ItemType.GADGET)
-        Item appleJuice = new Item("Apple Juice", 174, ItemType.FOOD)
-
-        List<Item> items = [nuggets, ham, ipad, appleJuice]
-
-        Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
+        def shape = new Polygon(4)
 
         when:
-        boolean hasFoodItems = service.cartContainsFoodItem(itemsInTheCart)
+        int sides = shape.getNumberOfSides()
 
         then:
-        hasFoodItems
+        sides == 4
     }
 
-    def "cartContainsFoodItem should verify if the cart has no food items."() {
-        given:
-        Item iphone = new Item("iPhone", 62000, ItemType.GADGET)
-        Item macBook = new Item("MacBook", 78000, ItemType.GADGET)
-        Item mouse = new Item("Mouse", 300, ItemType.GADGET)
-        Item keyboard = new Item("Keyboard", 400, ItemType.GADGET)
-
-        List<Item> items = [iphone, macBook, mouse, keyboard]
-
-        Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
-
-
+    def "should expect Exceptions"() {
         when:
-        boolean hasFoodItems = service.cartContainsFoodItem(itemsInTheCart)
+        new Polygon(0)
 
         then:
-        !hasFoodItems
+        // no need for .class
+        def e = thrown(TooFewSidesException)
+        // no need for get
+        e.numberOfSides == 0
     }
 
-
-    def "calculateTotalCostOfCart should get the sum of cost of i."() {
-        given:
-
-
-
+    def "should expect Exceptions for more than one value"() {
         when:
+        new Polygon(sides)
 
         then:
+        def e = thrown(TooFewSidesException)
+        e.numberOfSides == sides
 
+        where:
+        sides << [0, 1, 2]
+    }
+
+    @Unroll
+    def "should demonstrate simple data driven testing. Number of sides: #expected"() {
+        expect:
+        shape.getNumberOfSides() == expected
+
+        where:
+        expected << [3, 4, 5, 8, 14]
+        shape = new Polygon(expected)
+    }
+
+    def "should demonstrate data tables. Max of #a and #b should be #c"() {
+        expect:
+        Math.max(a, b) == c
+
+        where:
+        a | b || c
+        1 | 3 || 3
+        7 | 4 || 7
+        0 | 0 || 0
+    }
+
+    def "should be able to mock a concrete class"() {
+        given:
+        Renderer renderer = Mock()
+        @Subject
+        def shape = new Polygon(4, renderer)
+
+        when:
+        shape.draw()
+
+        then:
+        4 * renderer.drawLine()
+    }
+
+    def "should be able to use a stub"() {
+        given:
+        Palette palette = Stub()
+        palette.getPrimaryColour() >> Colour.Red
+        @Subject
+        def renderer = new Renderer(palette)
+
+        expect:
+        renderer.getForegroundColour() == Colour.Red
+    }
+
+    def "should demonstrate helper methods"() {
+        given:
+        def renderer = Mock(Renderer)
+        def shapeFactory = new ShapeFactory(renderer)
+
+        when:
+        def shape = shapeFactory.createDefaultPolygon()
+
+        then:
+        checkDefaultShape(shape, renderer)
+    }
+
+    private static void checkDefaultShape(Polygon shape, Renderer renderer) {
+        assert shape.numberOfSides == 4
+        assert shape.renderer == renderer
+    }
+
+    def "should demonstrate 'with'"() {
+        given:
+        def renderer = Mock(Renderer)
+        def shapeFactory = new ShapeFactory(renderer)
+
+        when:
+        def shape = shapeFactory.createDefaultPolygon()
+
+        then:
+        with(shape) {
+            numberOfSides == 4
+            renderer == renderer
+        }
+    }
+
+    def "should demonstrate 'verifyAll'"() {
+        given:
+        def renderer = Mock(Renderer)
+        def shapeFactory = new ShapeFactory(renderer)
+
+        when:
+        def shape = shapeFactory.createDefaultPolygon()
+
+        then:
+        verifyAll(shape) {
+            numberOfSides == 4
+            it.renderer == renderer
+        }
+    }
+
+    def "should show specification as documentation"() {
+        given: "a palette with red as the primary colour"
+        Palette palette = Stub()
+        palette.getPrimaryColour() >> Colour.Red
+
+        and: "a renderer initialised with the red palette"
+        def renderer = new Renderer(palette)
+
+        expect: "the renderer uses the palette's primary colour as the foreground colour"
+        renderer.getForegroundColour() == Colour.Red
     }
 }
