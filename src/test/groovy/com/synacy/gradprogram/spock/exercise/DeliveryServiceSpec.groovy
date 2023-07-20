@@ -43,4 +43,29 @@ class DeliveryServiceSpec extends Specification {
         25       | Courier.GRAB
         35       | Courier.LBC
     }
+
+    def "CreateDelivery should return a DeliveryRequest with the correct details"() {
+        given:
+        UUID expectedId = UUID.randomUUID()
+        order.getId() >> expectedId
+
+        def expectedDeliveryDate = new Date()
+        dateUtils.getCurrentDate() >> expectedDeliveryDate
+
+        order.getTotalCost() >> cost
+
+        when:
+        DeliveryRequest deliveryRequest = deliveryService.createDelivery(order)
+
+        then:
+        expectedId == deliveryRequest.getOrderId()
+        expectedDeliveryDate == deliveryRequest.getDeliveryDate()
+        expectedCourier == deliveryRequest.getCourier()
+
+        where:
+        cost     | expectedCourier
+        15       | Courier.JRS
+        25       | Courier.GRAB
+        35       | Courier.LBC
+    }
 }
