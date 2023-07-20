@@ -1,69 +1,67 @@
 //file:noinspection GroovyAssignabilityCheck
 package com.mechanitis.demo.spock
 
+import com.synacy.gradprogram.spock.exercise.*
+//import com.synacy.gradprogram.spock.exercise.OrderingService
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class ExampleSpecification extends Specification {
 
-    def "should demonstrate a simple assertion"() {
-        expect:
-        1 == 1
+    OrderingService service
+
+    def setup() {
+
+        service = new OrderingService()
     }
 
     // can use just when-then if there's no setup
-    def "should demonstrate given-when-then"() {
+    def "cartContainsFoodItem should verify if the cart has food items."() {
         given:
-        def shape = new Polygon(4)
+        Item nuggets = new Item("Nuggets", 185, ItemType.FOOD)
+        Item ham = new Item("Ham", 198, ItemType.FOOD)
+        Item ipad = new Item("iPad", 29990, ItemType.GADGET)
+        Item appleJuice = new Item("Apple Juice", 174, ItemType.FOOD)
+
+        List<Item> items = [nuggets, ham, ipad, appleJuice]
+
+        Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
 
         when:
-        int sides = shape.getNumberOfSides()
+        boolean hasFoodItems = service.cartContainsFoodItem(itemsInTheCart)
 
         then:
-        sides == 4
+        hasFoodItems
     }
 
-    def "should expect Exceptions"() {
+    def "cartContainsFoodItem should verify if the cart has no food items."() {
+        given:
+        Item iphone = new Item("iPhone", 62000, ItemType.GADGET)
+        Item macBook = new Item("MacBook", 78000, ItemType.GADGET)
+        Item mouse = new Item("Mouse", 300, ItemType.GADGET)
+        Item keyboard = new Item("Keyboard", 400, ItemType.GADGET)
+
+        List<Item> items = [iphone, macBook, mouse, keyboard]
+
+        Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
+
+
         when:
-        new Polygon(0)
+        boolean hasFoodItems = service.cartContainsFoodItem(itemsInTheCart)
 
         then:
-        // no need for .class
-        def e = thrown(TooFewSidesException)
-        // no need for get
-        e.numberOfSides == 0
+        !hasFoodItems
     }
 
-    def "should expect Exceptions for more than one value"() {
+
+    def "calculateTotalCostOfCart should get the sum of cost of i."() {
+        given:
+
+
+
         when:
-        new Polygon(sides)
 
         then:
-        def e = thrown(TooFewSidesException)
-        e.numberOfSides == sides
 
-        where:
-        sides << [0, 1, 2]
-    }
-
-    @Unroll
-    def "should demonstrate simple data driven testing. Number of sides: #expected"() {
-        expect:
-        shape.getNumberOfSides() == expected
-
-        where:
-        expected << [3, 4, 5, 8, 14]
-        shape = new Polygon(expected)
-    }
-
-    def "should demonstrate data tables. Max of #a and #b should be #c"() {
-        expect:
-        Math.max(a, b) == c
-
-        where:
-        a | b || c
-        1 | 3 || 3
-        7 | 4 || 7
-        0 | 0 || 0
     }
 }
