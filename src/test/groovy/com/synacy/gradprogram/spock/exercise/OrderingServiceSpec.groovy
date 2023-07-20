@@ -130,7 +130,7 @@ class OrderingServiceSpec extends Specification {
         def canContainFood = false
 
         when:
-        def testOrder = orderingService.createAnOrder(testCart, recipientName, recipientAddress, canContainFood)
+        orderingService.createAnOrder(testCart, recipientName, recipientAddress, canContainFood)
 
         then:
         UnableToCreateOrderException orderException = thrown(UnableToCreateOrderException)
@@ -149,9 +149,9 @@ class OrderingServiceSpec extends Specification {
         def testOrder = orderingService.createAnOrder(testCart, recipientName, recipientAddress, canContainFood)
 
         then:
-        testOrder.totalCost == orderingService.calculateTotalCostOfCart(testCart)
-        testOrder.recipientName == recipientName
-        testOrder.recipientAddress == recipientAddress
-        testOrder.status== OrderStatus.PENDING
+        orderingService.calculateTotalCostOfCart(testCart) == testOrder.getTotalCost()
+        recipientName == testOrder.getRecipientName()
+        recipientAddress == testOrder.getRecipientAddress()
+        OrderStatus.PENDING == testOrder.getStatus()
     }
 }
