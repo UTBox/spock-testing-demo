@@ -15,4 +15,17 @@ public class OrderSummary {
     this.deliveryDate = deliveryDate;
     this.courier = courier;
   }
+
+  public Double getTotalCost(){
+    return this.totalCost;
+  }
+  public OrderStatus getStatus(){
+    return this.status;
+  }
+  public Date getDeliveryDate(){
+    return this.deliveryDate;
+  }
+  public Courier getCourier(){
+    return this.courier;
+  }
 }
