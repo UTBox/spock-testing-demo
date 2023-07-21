@@ -27,24 +27,25 @@ class OrderingServiceSpec extends Specification {
         given:
         List<Item> testListItemWFood = [food, gadget, appliance, clothing]
         def testCart = new Cart(UUID.randomUUID(), testListItemWFood)
+        boolean isContainFood = true
 
         when:
         boolean foodItem = orderingService.cartContainsFoodItem(testCart)
 
         then:
-        true == foodItem
+        isContainFood == foodItem
     }
 
     def "cartContainsFoodItem should respond with false if cart does not contains item with type food"() {
         given:
         List<Item> testListItemWoFood = [gadget, appliance, clothing]
         def testCart = new Cart(UUID.randomUUID(), testListItemWoFood)
-
+        boolean isNotContainFood = false
         when:
         boolean foodItem = orderingService.cartContainsFoodItem(testCart)
 
         then:
-        false == foodItem
+        isNotContainFood == foodItem
     }
 
     def "calculateTotalCostOfCart should respond with the total cost of item inside the cart"() {
@@ -56,7 +57,7 @@ class OrderingServiceSpec extends Specification {
         double testTotal = orderingService.calculateTotalCostOfCart(testCart)
 
         then:
-        55 == testTotal
+        55d == testTotal
     }
 
     def "isCartEligibleForDiscount should respond with true if total cart price is greater than 50.0 and size is greater than 5"() {
@@ -64,12 +65,13 @@ class OrderingServiceSpec extends Specification {
         given:
         List<Item> testListItem = [food, gadget, appliance, clothing, food2, gadget2]
         def testCart = new Cart(UUID.randomUUID(), testListItem)
+        boolean isExpectedEligible = true
 
         when:
         boolean isEligible = orderingService.isCartEligibleForDiscount(testCart)
 
         then:
-        true == isEligible
+        isExpectedEligible == isEligible
     }
 
     def "isCartEligibleForDiscount should respond with false if cart price is less than 50.0 and cart size is less than 5"() {
@@ -77,12 +79,13 @@ class OrderingServiceSpec extends Specification {
         given:
         List<Item> testListItem = [food, gadget, clothing]
         def testCart = new Cart(UUID.randomUUID(), testListItem)
+        boolean isNotEligible = false
 
         when:
         boolean isEligible = orderingService.isCartEligibleForDiscount(testCart)
 
         then:
-        false == isEligible
+        isNotEligible == isEligible
     }
 
     def "isCartEligibleForDiscount should respond with false if cart price is greater than 50.0 but cart size is less than 5"() {
@@ -90,12 +93,13 @@ class OrderingServiceSpec extends Specification {
         given:
         List<Item> testListItem = [food, gadget, appliance, clothing]
         def testCart = new Cart(UUID.randomUUID(), testListItem)
+        boolean isNotEligible = false
 
         when:
         boolean isEligible = orderingService.isCartEligibleForDiscount(testCart)
 
         then:
-        false == isEligible
+        isNotEligible == isEligible
     }
 
     def "isCartEligibleForDiscount should respond with false if cart price is less than 50.0 but cart size is greater than 5"() {
@@ -103,28 +107,54 @@ class OrderingServiceSpec extends Specification {
         given:
         List<Item> testListItem = [food2, gadget2, clothing2, gadget, clothing, appliance2]
         def testCart = new Cart(UUID.randomUUID(), testListItem)
+        boolean isNotEligible = false
 
         when:
         boolean isEligible = orderingService.isCartEligibleForDiscount(testCart)
 
         then:
-        false == isEligible
+        isNotEligible == isEligible
     }
 
     @Unroll
     def "ApplyDiscountToCartItems should respond with discounted cost"() {
         given:
         List<Item> testListItem = [food, gadget, appliance, clothing, food2, gadget2]
-        List<Double> discountedCost = [1.5,1,2,1,0.5,0.5]
+
         def testCart = new Cart(UUID.randomUUID(), testListItem)
 
         when:
         orderingService.applyDiscountToCartItems(testCart)
 
         then:
-        0.upto(discountedCost.size() - 1) { index ->
+        /*0.upto(discountedCost.size() - 1) { index ->
             discountedCost[index] == testCart.items[index].cost
-        }
+        }*/
+        1.5d == testListItem[0].getCost()
+        1d == testListItem[1].getCost()
+        2d == testListItem[2].getCost()
+        1d == testListItem[3].getCost()
+        0.5d == testListItem[4].getCost()
+        0.5d == testListItem[5].getCost()
+    }
+
+    def "ApplyDiscountToCartItems should not respond with discounted cost"() {
+        given:
+        List<Item> testListItem = [food, gadget, appliance, clothing]
+
+        def testCart = new Cart(UUID.randomUUID(), testListItem)
+
+        when:
+        orderingService.applyDiscountToCartItems(testCart)
+
+        then:
+        /*0.upto(discountedCost.size() - 1) { index ->
+            discountedCost[index] == testCart.items[index].cost
+        }*/
+        15d == testListItem[0].getCost()
+        10d == testListItem[1].getCost()
+        20d == testListItem[2].getCost()
+        10d == testListItem[3].getCost()
     }
 
     def "CreateAnOrder should throw exception when canContainFood is true and cart has food items"() {
@@ -150,18 +180,16 @@ class OrderingServiceSpec extends Specification {
         def recipientName = "Harry"
         def recipientAddress = "Cebu City"
         def canContainFood = true
-        double totalCost = 30
 
         when:
-        Order testOrder = orderingService.createAnOrder(testCart, recipientName, recipientAddress, canContainFood)
+        orderingService.createAnOrder(testCart, recipientName, recipientAddress, canContainFood)
 
         then:
-        1 * orderRepository.saveOrder(_)
-//                >> {
-//            assert totalCost == testOrder.getTotalCost()
-//            assert recipientName == testOrder.getRecipientName()
-//            assert recipientAddress == testOrder.getRecipientAddress()
-//            assert OrderStatus.PENDING == testOrder.getStatus()
-//        }
+        1 * orderRepository.saveOrder(_) >> { Order testOrders ->
+            assert 45d == testOrders.getTotalCost()
+            assert recipientName == testOrders.getRecipientName()
+            assert recipientAddress == testOrders.getRecipientAddress()
+            assert OrderStatus.PENDING == testOrders.getStatus()
+        }
     }
 }
