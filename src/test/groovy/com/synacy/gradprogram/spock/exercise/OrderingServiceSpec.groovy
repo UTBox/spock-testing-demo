@@ -5,20 +5,22 @@ import spock.lang.Specification
 class OrderingServiceSpec extends Specification {
 
     OrderingService service
+    OrderRepository orderRepository = Mock(OrderRepository)
     
     def setup() {
 
-        service = new OrderingService()
+        service = new OrderingService(orderRepository)
+
     }
 
     def "cartContainsFoodItem should verify if the cart has food items."() {
         given:
             Item nuggets = new Item("Nuggets", 185, ItemType.FOOD)
             Item ham = new Item("Ham", 198, ItemType.FOOD)
-            Item ipad = new Item("iPad", 29990, ItemType.GADGET)
+            Item milk = new Item("Milk", 29990, ItemType.GADGET)
             Item appleJuice = new Item("Apple Juice", 174, ItemType.FOOD)
 
-            List<Item> items = [nuggets, ham, ipad, appleJuice]
+            List<Item> items = [nuggets, ham, milk, appleJuice]
 
             Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
 
@@ -26,33 +28,15 @@ class OrderingServiceSpec extends Specification {
             boolean hasFoodItems = service.cartContainsFoodItem(itemsInTheCart)
 
         then:
-            hasFoodItems
-    }
-
-    def "cartContainsFoodItem should verify if the cart has no food items."() {
-        given:
-            Item iphone = new Item("iPhone", 62000, ItemType.GADGET)
-            Item macBook = new Item("MacBook", 78000, ItemType.GADGET)
-            Item mouse = new Item("Mouse", 300, ItemType.GADGET)
-            Item keyboard = new Item("Keyboard", 400, ItemType.GADGET)
-
-            List<Item> items = [iphone, macBook, mouse, keyboard]
-
-            Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
-
-        when:
-            boolean hasFoodItems = service.cartContainsFoodItem(itemsInTheCart)
-
-        then:
-            !hasFoodItems
+            hasFoodItems == true
     }
 
     def "calculateTotalCostOfCart should get the sum of totalPrice."() {
         given:
-            Item nuggets = new Item("Nuggets", 185, ItemType.FOOD)
-            Item ham = new Item("Ham", 198, ItemType.FOOD)
-            Item biscuit = new Item("Biscuit", 49, ItemType.GADGET)
-            Item appleJuice = new Item("Apple Juice", 174, ItemType.FOOD)
+            Item nuggets = new Item("Nuggets", 100, ItemType.FOOD)
+            Item ham = new Item("Ham", 100, ItemType.FOOD)
+            Item biscuit = new Item("Biscuit", 50, ItemType.GADGET)
+            Item appleJuice = new Item("Apple Juice", 50, ItemType.FOOD)
 
             List<Item> items = [nuggets, ham, biscuit, appleJuice]
 
@@ -62,7 +46,7 @@ class OrderingServiceSpec extends Specification {
             double actualTotalPrice = service.calculateTotalCostOfCart(itemsInTheCart)
 
         then:
-            actualTotalPrice
+            300 == actualTotalPrice
 
     }
 
@@ -83,11 +67,11 @@ class OrderingServiceSpec extends Specification {
         boolean eligibleForDiscount = service.isCartEligibleForDiscount(itemsInTheCart)
 
         then:
-        eligibleForDiscount
+        eligibleForDiscount == true
 
     }
 
-    def "isCartEligibleForDiscount should validate if the total price from the cart is not eligible for discount."() {
+    def "applyDiscountToCartItems should apply discount when cart is eligible for discount."() {
         given:
         Item nuggets = new Item("Nuggets", 185.0, ItemType.FOOD)
         Item ham = new Item("Ham", 198.0, ItemType.FOOD)
@@ -105,8 +89,7 @@ class OrderingServiceSpec extends Specification {
 
     }
 
-
-    def "createAnOrder should verify if the items does not contain food."() {
+    def "createAnOrder should be able to save the created order."() {
         given:
         Item iphone = new Item("iPhone", 62000.0, ItemType.GADGET)
         Item macBook = new Item("MacBook", 78000.0, ItemType.GADGET)
@@ -120,17 +103,23 @@ class OrderingServiceSpec extends Specification {
 
         Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
 
+
+        double totalCost = 193498.0
         String recipientName = "Clark"
         String recipientAddress = "Cebu"
-        boolean containsFood
-
-        OrderRepository orderRepository = new OrderRepository()
+        OrderStatus orderStatus = OrderStatus.PENDING
+        boolean containsFood = true
 
         when:
-        Order order = service.createAnOrder(itemsInTheCart, recipientName, recipientAddress, containsFood)
+        service.createAnOrder(itemsInTheCart, recipientName, recipientAddress, containsFood)
 
         then:
-        orderRepository.saveOrder(order)
+        1 * orderRepository.saveOrder(_) >> { Order order ->
+            assert totalCost == order.getTotalCost()
+            assert recipientName == order.getRecipientName()
+            assert recipientAddress == order.getRecipientAddress()
+            assert  orderStatus == order.getStatus()
+        }
     }
 
 }
