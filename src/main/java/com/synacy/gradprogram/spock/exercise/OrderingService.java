@@ -45,6 +45,7 @@ public class OrderingService {
         item.setCost(discountedCost);
       }
     }
+
   }
 
   public Order createAnOrder(Cart cart, String recipientName, String recipientAddress, boolean canContainFood) {

@@ -73,19 +73,28 @@ class OrderingServiceSpec extends Specification {
 
     def "applyDiscountToCartItems should apply discount when cart is eligible for discount."() {
         given:
-        Item nuggets = new Item("Nuggets", 185.0, ItemType.FOOD)
-        Item ham = new Item("Ham", 198.0, ItemType.FOOD)
-        Item biscuit = new Item("Biscuit", 49.0, ItemType.GADGET)
+        Item nuggets = new Item("Nuggets", 50.0, ItemType.FOOD)
+        Item ham = new Item("Ham", 80.0, ItemType.FOOD)
+        Item biscuit = new Item("Biscuit", 50.0, ItemType.GADGET)
+        Item appleJuice = new Item("Apple Juice", 150.0, ItemType.FOOD)
+        Item milk = new Item("Milk", 100.0, ItemType.FOOD)
+        Item chocolate = new Item("Chocolate", 300.0, ItemType.FOOD)
 
-        List<Item> items = [nuggets, ham, biscuit]
+        List<Item> items = [nuggets, ham, biscuit, appleJuice, milk, chocolate]
 
         Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
 
+
         when:
-        boolean eligibleForDiscount = service.isCartEligibleForDiscount(itemsInTheCart)
+        service.applyDiscountToCartItems(itemsInTheCart)
 
         then:
-        !eligibleForDiscount
+        5d == items[0].getCost()
+        8d == items[1].getCost()
+        5d == items[2].getCost()
+        15d == items[3].getCost()
+        10d == items[4].getCost()
+        30d == items[5].getCost()
 
     }
 
