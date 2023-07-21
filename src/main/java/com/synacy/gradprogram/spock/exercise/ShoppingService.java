@@ -20,10 +20,8 @@ public class ShoppingService {
 
   public void buyNonSpoilingItemsInCart(Cart cart, User user) {
     orderingService.applyDiscountToCartItems(cart);
-
     String recipientName = user.getFirstName().concat(" ").concat(user.getLastName());
     Order order = orderingService.createAnOrder(cart, recipientName, user.getAddress(), false);
-
     deliveryService.createDelivery(order);
   }
 

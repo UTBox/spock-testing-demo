@@ -5,7 +5,7 @@ public class DeliveryService {
   private final DateUtils dateUtils;
   private final DeliveryRequestRepository deliveryRequestRepository;
 
-  public DeliveryService(DateUtils dateUtils, DeliveryRequestRepository deliveryRequestRepository) {
+  public DeliveryService(DeliveryRequestRepository deliveryRequestRepository, DateUtils dateUtils) {
     this.dateUtils = dateUtils;
     this.deliveryRequestRepository = deliveryRequestRepository;
   }
