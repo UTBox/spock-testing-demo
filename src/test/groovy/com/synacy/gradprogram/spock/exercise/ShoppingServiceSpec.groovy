@@ -53,6 +53,9 @@ class ShoppingServiceSpec extends Specification {
         DeliveryRequest testDeliveryRequest = new DeliveryRequest(orderId: testUuid,
                 deliveryDate: new Date(), courier: Courier.JRS)
 
+        orderRepository.fetchOrderById(testUuid) >> testOrder
+        deliveryRequestRepository.fetchDeliveryRequestByOrderId(testUuid) >> testDeliveryRequest
+
         when:
         OrderSummary orderSummary = shoppingService.getOrderSummary(testUuid)
 
