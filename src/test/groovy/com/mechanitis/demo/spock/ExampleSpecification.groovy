@@ -154,3 +154,4 @@ class ExampleSpecification extends Specification {
         renderer.getForegroundColour() == Colour.Red
     }
 }
+

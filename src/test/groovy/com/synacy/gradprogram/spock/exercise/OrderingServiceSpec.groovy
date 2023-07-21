@@ -2,7 +2,7 @@ package com.synacy.gradprogram.spock.exercise
 
 import spock.lang.Specification
 
-class OrderingServiceTest extends Specification {
+class OrderingServiceSpec extends Specification {
 
     OrderingService service
     
@@ -105,25 +105,32 @@ class OrderingServiceTest extends Specification {
 
     }
 
-    def "applyDiscountToCartItems should apply the discount to each items from the Cart."() {
+
+    def "createAnOrder should verify if the items does not contain food."() {
         given:
-            Item nuggets = new Item("Nuggets", 185.0, ItemType.FOOD)
-            Item ham = new Item("Ham", 198.0, ItemType.FOOD)
-            Item biscuit = new Item("Biscuit", 49.0, ItemType.GADGET)
-            Item appleJuice = new Item("Apple Juice", 174.0, ItemType.FOOD)
-            Item milk = new Item("Milk", 98.0, ItemType.FOOD)
-            Item chocolate = new Item("Chocolate", 357.0, ItemType.FOOD)
+        Item iphone = new Item("iPhone", 62000.0, ItemType.GADGET)
+        Item macBook = new Item("MacBook", 78000.0, ItemType.GADGET)
+        Item mouse = new Item("Mouse", 300.0, ItemType.GADGET)
+        Item keyboard = new Item("Keyboard", 400.0, ItemType.GADGET)
+        Item headphone = new Item("Headphone", 800.0, ItemType.GADGET)
+        Item airpods = new Item("Airpods", 12999.0, ItemType.GADGET)
+        Item ipad = new Item("iPad", 38999.0, ItemType.GADGET)
 
-            List<Item> items = [nuggets, ham, biscuit, appleJuice, milk, chocolate]
+        List<Item> items = [iphone, macBook, mouse, keyboard, headphone, airpods, ipad]
 
-            Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
+        Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
+
+        String recipientName = "Clark"
+        String recipientAddress = "Cebu"
+        boolean containsFood
+
+        OrderRepository orderRepository = new OrderRepository()
 
         when:
-            double discountedCost = service.applyDiscountToCartItems(itemsInTheCart)
+        Order order = service.createAnOrder(itemsInTheCart, recipientName, recipientAddress, containsFood)
 
         then:
-            discountedCost
-
+        orderRepository.saveOrder(order)
     }
 
 }

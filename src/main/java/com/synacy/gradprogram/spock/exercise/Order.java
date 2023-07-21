@@ -10,7 +10,7 @@ public class Order {
   private String recipientAddress;
   private OrderStatus status;
 
-  public Order() {
+    public Order() {
     this.id = UUID.randomUUID();
   }
 
@@ -39,6 +39,7 @@ public class Order {
   }
 
   public void setTotalCost(double totalCost) {
+
     this.totalCost = totalCost;
   }
 

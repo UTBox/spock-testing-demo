@@ -8,6 +8,7 @@ class UserGroupServiceSpec extends Specification {
     UserGroupRepository userGroupRepository = Mock(UserGroupRepository)
     DateService dateService = Mock(DateService)
 
+
     def setup() {
 
         service = new UserGroupService(userGroupRepository, dateService)
