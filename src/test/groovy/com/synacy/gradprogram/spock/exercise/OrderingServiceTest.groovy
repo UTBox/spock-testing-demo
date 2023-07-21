@@ -1,6 +1,7 @@
 package com.synacy.gradprogram.spock.exercise
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class OrderingServiceTest extends Specification {
 
@@ -101,6 +102,20 @@ class OrderingServiceTest extends Specification {
         eligibleForDiscountExpected == eligibleForDiscountActual
     }
 
+    def "applyDiscountToCartItems should do nothing if cart is not eligible for discount"() {
+        given:
+        List itemListWithHighCostFewItems = [gadgetItem, applianceItem]
+        Cart cartWithHighCostFewItems = new Cart(UUID.randomUUID(), itemListWithHighCostFewItems)
+        Cart expectedCart = cartWithHighCostFewItems
+
+        when:
+        orderingService.applyDiscountToCartItems(cartWithHighCostFewItems)
+
+        then:
+        expectedCart == cartWithHighCostFewItems
+    }
+
+    @Unroll
     def "applyDiscountToCartItems should set cost of each item in cart to 10 percent of original"() {
         given:
         Item itemForDiscount1 = new Item("cookie", 200.0, ItemType.FOOD)
@@ -112,18 +127,19 @@ class OrderingServiceTest extends Specification {
         List itemListForDiscount = [itemForDiscount1, itemForDiscount2, itemForDiscount3,
                                     itemForDiscount4, itemForDiscount5, itemForDiscount6]
         List expectedCostOfItems = [20.0, 100.0, 500.0, 50.0, 2.0, 1000.0]
-        List actualCostOfItems = []
 
         Cart cartForDiscount = new Cart(UUID.randomUUID(), itemListForDiscount)
 
         when:
-        orderingService.applyDiscountToCartItems(cartForDiscount);
-        for (Item discountedItem in cartForDiscount.getItems()) {
-            actualCostOfItems.add(discountedItem.getCost())
-        }
+        orderingService.applyDiscountToCartItems(cartForDiscount)
 
         then:
-        expectedCostOfItems == actualCostOfItems
+        expectedCostOfItems.get(0) == cartForDiscount.getItems().get(0).getCost()
+        expectedCostOfItems.get(1) == cartForDiscount.getItems().get(1).getCost()
+        expectedCostOfItems.get(2) == cartForDiscount.getItems().get(2).getCost()
+        expectedCostOfItems.get(3) == cartForDiscount.getItems().get(3).getCost()
+        expectedCostOfItems.get(4) == cartForDiscount.getItems().get(4).getCost()
+        expectedCostOfItems.get(5) == cartForDiscount.getItems().get(5).getCost()
     }
 
     def "createAnOrder should throw UnableToCreateOrderException if canContainFood is false and cart contains food"() {
