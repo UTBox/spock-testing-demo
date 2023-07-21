@@ -29,29 +29,14 @@ class ShoppingServiceSpec extends Specification {
 
         then:
         1 * deliveryService.createDelivery(_)
+//                >> {
+//            Order order ->
+//            assert firstName.concat(" ")
+//        }
 
     }
 
     def "GetOrderSummary should return the total cost, status, delivery date, and courier based on the order ID"() {
-//        given:
-//        String name = "Harry Styles"
-//        String address = "Cebu City"
-//        double totalCost = 100.0
-//        OrderStatus orderStatus = OrderStatus.PENDING
-//        Date deliveryDate = new Date()
-//
-//        Courier courier = Courier.LBC
-//        Order order = new Order(recipientName: name, recipientAddress: address, totalCost: totalCost)
-//        UUID orderId = order.getId()
-//
-//        orderRepository.fetchOrderById(orderId) >> order
-//        deliveryRequestRepository.fetchDeliveryRequestByOrderId(orderId) >> deliveryRequest
-//
-//        when:
-//        OrderSummary result = shoppingService.getOrderSummary(orderId)
-//
-//        then:
-//        1 * orderRepository.fetchOrderById(orderId)
-//        1 * deliveryRequestRepository.fetchDeliveryRequestByOrderId(orderId)
+
     }
 }
