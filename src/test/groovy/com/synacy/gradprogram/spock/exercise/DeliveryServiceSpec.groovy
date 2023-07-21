@@ -51,7 +51,7 @@ class DeliveryServiceSpec extends Specification {
         service.determineCourier(orderTotalCost) == Courier.GRAB
 
         where:
-        orderTotalCost << (20..30)
+        orderTotalCost << (20d..30d)
     }
 
     @Unroll
