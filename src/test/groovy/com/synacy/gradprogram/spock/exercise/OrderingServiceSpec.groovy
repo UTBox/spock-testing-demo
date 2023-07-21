@@ -1,7 +1,6 @@
 package com.synacy.gradprogram.spock.exercise
 
 import spock.lang.Specification
-import spock.lang.Unroll
 
 class OrderingServiceSpec extends Specification {
 
@@ -11,7 +10,6 @@ class OrderingServiceSpec extends Specification {
         orderingService = new OrderingService(orderRepository)
     }
 
-
     Item food = new Item("Burger", 15, ItemType.FOOD)
     Item food2 = new Item("Pizza", 5, ItemType.FOOD)
     Item gadget = new Item("Cellphone", 10, ItemType.GADGET)
@@ -20,8 +18,6 @@ class OrderingServiceSpec extends Specification {
     Item appliance2 = new Item("TV", 5, ItemType.APPLIANCE)
     Item clothing = new Item("Dress", 10, ItemType.CLOTHING)
     Item clothing2 = new Item("Dress", 5, ItemType.CLOTHING)
-
-
 
     def "cartContainsFoodItem should respond with true if cart contains item with type food"() {
         given:
@@ -116,7 +112,6 @@ class OrderingServiceSpec extends Specification {
         isNotEligible == isEligible
     }
 
-    @Unroll
     def "ApplyDiscountToCartItems should respond with discounted cost"() {
         given:
         List<Item> testListItem = [food, gadget, appliance, clothing, food2, gadget2]
@@ -127,9 +122,6 @@ class OrderingServiceSpec extends Specification {
         orderingService.applyDiscountToCartItems(testCart)
 
         then:
-        /*0.upto(discountedCost.size() - 1) { index ->
-            discountedCost[index] == testCart.items[index].cost
-        }*/
         1.5d == testListItem[0].getCost()
         1d == testListItem[1].getCost()
         2d == testListItem[2].getCost()
