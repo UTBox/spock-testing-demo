@@ -1,7 +1,6 @@
 package com.synacy.gradprogram.spock.exercise
 
 import spock.lang.Specification
-import spock.lang.Unroll
 
 class OrderingServiceTest extends Specification {
 
@@ -104,15 +103,19 @@ class OrderingServiceTest extends Specification {
 
     def "applyDiscountToCartItems should do nothing if cart is not eligible for discount"() {
         given:
-        List itemListWithHighCostFewItems = [gadgetItem, applianceItem]
-        Cart cartWithHighCostFewItems = new Cart(UUID.randomUUID(), itemListWithHighCostFewItems)
-        Cart expectedCart = cartWithHighCostFewItems
+        Item itemForDiscount1 = new Item("cookie", 200.0, ItemType.FOOD)
+        Item itemForDiscount2 = new Item("phone", 1000.0, ItemType.GADGET)
+        List itemListForDiscount = [itemForDiscount1, itemForDiscount2]
+        List expectedCostOfItems = [200.0d, 1000.0d]
+
+        Cart cartForDiscount = new Cart(UUID.randomUUID(), itemListForDiscount)
 
         when:
-        orderingService.applyDiscountToCartItems(cartWithHighCostFewItems)
+        orderingService.applyDiscountToCartItems(cartForDiscount)
 
         then:
-        expectedCart == cartWithHighCostFewItems
+        expectedCostOfItems.get(0) == cartForDiscount.getItems().get(0).getCost()
+        expectedCostOfItems.get(1) == cartForDiscount.getItems().get(1).getCost()
     }
 
     def "applyDiscountToCartItems should set cost of each item in cart to 10 percent of original"() {
@@ -125,7 +128,7 @@ class OrderingServiceTest extends Specification {
         Item itemForDiscount6 = new Item("iphone", 10000.0, ItemType.GADGET)
         List itemListForDiscount = [itemForDiscount1, itemForDiscount2, itemForDiscount3,
                                     itemForDiscount4, itemForDiscount5, itemForDiscount6]
-        List expectedCostOfItems = [20.0, 100.0, 500.0, 50.0, 2.0, 1000.0]
+        List expectedCostOfItems = [20.0d, 100.0d, 500.0d, 50.0d, 2.0d, 1000.0d]
 
         Cart cartForDiscount = new Cart(UUID.randomUUID(), itemListForDiscount)
 
