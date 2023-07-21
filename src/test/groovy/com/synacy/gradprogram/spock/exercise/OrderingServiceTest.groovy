@@ -115,7 +115,6 @@ class OrderingServiceTest extends Specification {
         expectedCart == cartWithHighCostFewItems
     }
 
-    @Unroll
     def "applyDiscountToCartItems should set cost of each item in cart to 10 percent of original"() {
         given:
         Item itemForDiscount1 = new Item("cookie", 200.0, ItemType.FOOD)
