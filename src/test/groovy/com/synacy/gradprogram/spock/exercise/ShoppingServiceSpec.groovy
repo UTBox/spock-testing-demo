@@ -47,7 +47,7 @@ class ShoppingServiceSpec extends Specification {
         given:
         UUID orderId = UUID.randomUUID()
         Order order = Mock(Order)
-        DeliveryRequest deliveryRequest = new DeliveryRequest(orderId: orderId, deliveryDate: LocalDate.of(2023, 7, 21), courier: Courier.GRAB  )
+        DeliveryRequest deliveryRequest = new DeliveryRequest(orderId: orderId, deliveryDate: LocalDate.of(2023, 7, 21), courier: Courier.GRAB)
 
     }
 }

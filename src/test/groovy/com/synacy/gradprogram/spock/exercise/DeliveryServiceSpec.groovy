@@ -50,7 +50,7 @@ class DeliveryServiceSpec extends Specification {
         expect:
         service.determineCourier(orderTotalCost) == Courier.GRAB
 
-        then:
+        where:
         orderTotalCost << (20..30)
     }
 
@@ -59,7 +59,7 @@ class DeliveryServiceSpec extends Specification {
         expect:
         service.determineCourier(orderTotalCost) == Courier.LBC
 
-        then:
+        where:
         orderTotalCost << (30..50)
     }
 }
