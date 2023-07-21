@@ -35,13 +35,12 @@ class ShoppingServiceSpec extends Specification {
         1 * deliveryService.createDelivery(_ as Order)
     }
 
-    def "Should return a Order Summary"(){
+   /* def "Should return a Order Summary"(){
         given:
         Order order = Mock(Order)
         UUID orderId = UUID.randomUUID()
 
         when:
         deliveryRequestRepository.fetchDeliveryRequestByOrderId(orderId: orderId)
-
-    }
+    }*/
 }

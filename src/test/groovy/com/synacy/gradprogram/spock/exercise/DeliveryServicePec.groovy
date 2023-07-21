@@ -30,8 +30,8 @@ class DeliveryServiceSpec extends Specification {
         result.deliveryDate != null
     }
     def "Should return JRS for order total cost less than 20"(){
-        when:
-        Courier courier = deliveryService.determineCourier(10)
+       when:
+       Courier courier = deliveryService.determineCourier(15)
 
         then:
         courier == Courier.JRS
@@ -39,7 +39,6 @@ class DeliveryServiceSpec extends Specification {
 
 
     def "Should return LBC for order total cost greater than 30"() {
-
         when:
         Courier courier = deliveryService.determineCourier(40)
 
