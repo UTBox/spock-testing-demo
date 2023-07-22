@@ -5,10 +5,15 @@ import java.math.BigDecimal;
 public class RefundService {
 
   public BigDecimal calculateRefund(CancelOrderRequest request, Order order) {
+    long refundDateLimit = order.getDateOrdered().getTime() + (86400000 * 3);
+
     if (request.getReason() == CancelReason.DAMAGED) {
       return BigDecimal.valueOf(order.getTotalCost());
+    } else if (request.getDateCancelled().getTime() < refundDateLimit) {
+      return BigDecimal.valueOf(order.getTotalCost());
     }
-    //  TODO: Also full refund if the order was cancelled within 3 days of order date, else refund half of the total cost.
+
+    //  TODO: else refund half of the total cost.
     return null;
   }
 
