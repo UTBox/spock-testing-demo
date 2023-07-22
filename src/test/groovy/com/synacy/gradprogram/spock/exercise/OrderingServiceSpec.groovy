@@ -13,7 +13,7 @@ class OrderingServiceSpec extends Specification {
         orderingService = new OrderingService(orderRepository, refundService)
     }
 
-    def "cancelOrder should set OrderStatus to CANCELLED for orders with status PENDING and FOR_DELIVERY"() {
+    def "cancelOrder should save OrderStatus to CANCELLED for orders with status PENDING and FOR_DELIVERY in repository"() {
         given:
         CancelOrderRequest request = Mock(CancelOrderRequest)
 
@@ -21,7 +21,9 @@ class OrderingServiceSpec extends Specification {
         orderingService.cancelOrder(request, order)
 
         then:
-        expectedStatus == order.getStatus()
+        1 * orderRepository.saveOrder(order) >> { Order testOrder ->
+            assert expectedStatus == testOrder.getStatus()
+        }
 
         where:
         order                                        |          expectedStatus
