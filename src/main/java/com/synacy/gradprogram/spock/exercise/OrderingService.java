@@ -71,6 +71,7 @@ public class OrderingService {
   public void cancelOrder(CancelOrderRequest request, Order order) throws UnableToCancelException {
     if (order.getStatus() == OrderStatus.PENDING || order.getStatus() == OrderStatus.FOR_DELIVERY) {
       order.setStatus(OrderStatus.CANCELLED);
+      orderRepository.saveOrder(order);
     } else {
       throw new UnableToCancelException();
     }
