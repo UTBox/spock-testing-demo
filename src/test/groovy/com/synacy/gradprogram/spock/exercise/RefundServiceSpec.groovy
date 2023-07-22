@@ -9,8 +9,8 @@ class RefundServiceSpec extends Specification {
     DateUtils dateUtils = new DateUtils()
 
     void setup() {
-        refundService = new RefundService()
         refundRepository = Mock(RefundRepository)
+        refundService = new RefundService(refundRepository)
     }
 
     def "calculateRefund should return full total cost if cancel reason is DAMAGED"() {
@@ -41,7 +41,7 @@ class RefundServiceSpec extends Specification {
     }
 
     def "calculateRefund should return half of the total cost for dateCancelled more than 3 days after dateOrdered"() {
-
+        given:
         Date dateOrdered = dateUtils.getCurrentDate()
         Date dateLimit = new Date(dateOrdered.getTime() + (86400000 * 3) + 1)
 
@@ -59,12 +59,13 @@ class RefundServiceSpec extends Specification {
         given:
         Order order = new Order(totalCost: 100, dateOrdered: new Date(), recipientName: "John Doe")
         CancelOrderRequest request = new CancelOrderRequest(dateCancelled: new Date())
+        BigDecimal refund = 100
 
         when:
-        BigDecimal refund = refundService.calculateRefund(request, order)
+        refundService.calculateRefund(request, order)
 
         then:
-        1 * refundRepository.saveRefundRequest(_) >> {RefundRequest refundRequest ->
+        1 * refundRepository.saveRefundRequest(_) >> { RefundRequest refundRequest ->
             assert order.recipientName == refundRequest.getRecipientName()
             assert order.getId() == refundRequest.getOrderId()
             assert refund == refundRequest.getRefundAmount()

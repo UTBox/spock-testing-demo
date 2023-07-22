@@ -19,12 +19,21 @@ public class RefundService {
     } else {
       refundAmount = BigDecimal.valueOf(order.getTotalCost()/2);
     }
+
+    createAndSaveRefundRequest(order, refundAmount);
+
     return refundAmount;
   }
 
-  private void createAndSaveRefundRequest(Order order) {
-    // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
+  private void createAndSaveRefundRequest(Order order, BigDecimal refundAmount) {
+    RefundRequest refundRequest = new RefundRequest();
 
+    refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
+    refundRequest.setRecipientName(order.getRecipientName());
+    refundRequest.setRefundAmount(refundAmount);
+    refundRequest.setOrderId(order.getId());
+
+    refundRepository.saveRefundRequest(refundRequest);
   }
 
 }
