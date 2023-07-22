@@ -29,7 +29,9 @@ public class RefundService {
 
   private void createAndSaveRefundRequest(RefundRequest refundRequest) {
     // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
-
+    if(refundRequest.getStatus() == RefundRequestStatus.TO_PROCESS){
+      refundRepository.saveRefundRequest(refundRequest);
+    }
   }
 
 }

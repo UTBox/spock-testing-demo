@@ -44,16 +44,28 @@ class RefundServiceSpec extends Specification {
         totalRefund == expectedRefund
     }
 
-    def "createAndSaveRefundRequest Should return true if the Refund Request is TO_PROCESS"(){
+    def "createAndSaveRefundRequest Should save if the Refund Request Status is TO_PROCESS"(){
+        given:
+        RefundRequest refundRequest = new RefundRequest()
+        refundRequest.setStatus(RefundRequestStatus.TO_PROCESS)
+
+        when:
+        refundService.createAndSaveRefundRequest(refundRequest)
+
+        then:
+        1 * refundRepository.saveRefundRequest(refundRequest)
+    }
+
+    def "createAndSaveRefundRequest Should not save if the Refund Request Status is not TO_PROCESS"(){
         given:
         RefundRequest refundRequest = new RefundRequest()
         refundRequest.setStatus(RefundRequestStatus.PROCESSED)
 
         when:
-        boolean result = refundService.createAndSaveRefundRequest(refundRequest)
+        refundService.createAndSaveRefundRequest(refundRequest)
 
         then:
-        result == true
-        1 * refundRepository.saveRefundRequest(refundRequest)
+        0 * refundRepository.saveRefundRequest(_)
     }
+
 }
