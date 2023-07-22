@@ -6,14 +6,12 @@ public class RefundService {
 
   private final OrderingService orderingService;
 
-  private final RefundRequest refundRequest;
 
-  public RefundService(OrderingService orderingService, RefundRequest refundRequest) {
+  public RefundService(OrderingService orderingService) {
     this.orderingService = orderingService;
-    this.refundRequest = refundRequest;
   }
 
-  public BigDecimal calculateRefund(CancelReason cancelReason, Cart cart) {
+  public BigDecimal calculateRefund(CancelReason cancelReason, Cart cart, RefundRequest refundRequest) {
     // TODO: Implement me. Full refund if cancel reason is due to damaged item.
     //  Also full refund if the order was cancelled within 3 days of order date, else refund half of the total cost.
     double refundAmount = orderingService.calculateTotalCostOfCart(cart);

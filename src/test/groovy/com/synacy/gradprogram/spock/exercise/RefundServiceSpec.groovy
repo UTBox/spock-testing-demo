@@ -6,10 +6,10 @@ class RefundServiceSpec extends Specification {
 
     RefundService service
     OrderingService orderingService = Mock(OrderingService)
-    RefundRequest refundRequest = Mock(RefundRequest)
-
+    RefundRequest refundRequest
     void setup() {
-        service = new RefundService(orderingService, refundRequest)
+        service = new RefundService(orderingService)
+        refundRequest = new RefundRequest()
     }
 
     def "calculateRefund should give full refund due to damage item cancel reason"() {
@@ -18,13 +18,15 @@ class RefundServiceSpec extends Specification {
                             new Item("Nike", 500.00d, ItemType.CLOTHING),
                             new Item("Rice Cooker", 300.75d, ItemType.APPLIANCE),
                             new Item("IPhone", 23000.00d, ItemType.GADGET)]
+        double totalCost = 23650.75d
         Cart cart = new Cart(UUID.randomUUID(), items)
-        orderingService.calculateTotalCostOfCart(cart) >> 23650.75d
+        orderingService.calculateTotalCostOfCart(cart) >> totalCost
 
         when:
-        BigDecimal refundAmount = service.calculateRefund(CancelReason.DAMAGED, cart)
+        BigDecimal refundAmount = service.calculateRefund(CancelReason.DAMAGED, cart, refundRequest)
 
         then:
-        refundAmount == BigDecimal.valueOf(23650.75d)
+        refundAmount == BigDecimal.valueOf(totalCost)
+        refundRequest.getRefundAmount() == BigDecimal.valueOf(totalCost)
     }
 }
