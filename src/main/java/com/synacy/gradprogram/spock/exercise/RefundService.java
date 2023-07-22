@@ -11,10 +11,9 @@ public class RefundService {
       return BigDecimal.valueOf(order.getTotalCost());
     } else if (request.getDateCancelled().getTime() < refundDateLimit) {
       return BigDecimal.valueOf(order.getTotalCost());
+    } else {
+      return BigDecimal.valueOf(order.getTotalCost()/2);
     }
-
-    //  TODO: else refund half of the total cost.
-    return null;
   }
 
   private void createAndSaveRefundRequest() {
