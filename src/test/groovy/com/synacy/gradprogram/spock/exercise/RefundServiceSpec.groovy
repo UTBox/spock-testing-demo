@@ -38,4 +38,19 @@ class RefundServiceSpec extends Specification {
         then:
         order.getTotalCost() as BigDecimal == refund
     }
+
+    def "calculateRefund should return half of the total cost for dateCancelled more than 3 days after dateOrdered"() {
+
+        Date dateOrdered = dateUtils.getCurrentDate()
+        Date dateLimit = new Date(dateOrdered.getTime() + (86400000 * 3) + 1)
+
+        Order order = new Order(totalCost: 100, dateOrdered: dateOrdered)
+        CancelOrderRequest request = new CancelOrderRequest(dateCancelled: dateLimit)
+
+        when:
+        BigDecimal refund = refundService.calculateRefund(request, order)
+
+        then:
+        order.getTotalCost()/2 as BigDecimal == refund
+    }
 }
