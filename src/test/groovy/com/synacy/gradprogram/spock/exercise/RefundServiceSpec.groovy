@@ -5,11 +5,12 @@ import spock.lang.Specification
 class RefundServiceSpec extends Specification {
 
     RefundService refundService
+    RefundRepository refundRepository
     DateUtils dateUtils = new DateUtils()
 
     void setup() {
         refundService = new RefundService()
-
+        refundRepository = Mock(RefundRepository)
     }
 
     def "calculateRefund should return full total cost if cancel reason is DAMAGED"() {
@@ -52,5 +53,22 @@ class RefundServiceSpec extends Specification {
 
         then:
         order.getTotalCost()/2 as BigDecimal == refund
+    }
+
+    def "calculateRefund should save a TO_PROCESS refund request with correct values"() {
+        given:
+        Order order = new Order(totalCost: 100, dateOrdered: new Date(), recipientName: "John Doe")
+        CancelOrderRequest request = new CancelOrderRequest(dateCancelled: new Date())
+
+        when:
+        BigDecimal refund = refundService.calculateRefund(request, order)
+
+        then:
+        1 * refundRepository.saveRefundRequest(_) >> {RefundRequest refundRequest ->
+            assert order.recipientName == refundRequest.getRecipientName()
+            assert order.getId() == refundRequest.getOrderId()
+            assert refund == refundRequest.getRefundAmount()
+            assert RefundRequestStatus.TO_PROCESS == refundRequest.getStatus()
+        }
     }
 }
