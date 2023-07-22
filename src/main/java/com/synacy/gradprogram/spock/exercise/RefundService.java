@@ -4,9 +4,24 @@ import java.math.BigDecimal;
 
 public class RefundService {
 
-  public BigDecimal calculateRefund() {
+  private final OrderingService orderingService;
+
+  private final RefundRequest refundRequest;
+
+  public RefundService(OrderingService orderingService, RefundRequest refundRequest) {
+    this.orderingService = orderingService;
+    this.refundRequest = refundRequest;
+  }
+
+  public BigDecimal calculateRefund(CancelReason cancelReason, Cart cart) {
     // TODO: Implement me. Full refund if cancel reason is due to damaged item.
     //  Also full refund if the order was cancelled within 3 days of order date, else refund half of the total cost.
+    double refundAmount = orderingService.calculateTotalCostOfCart(cart);
+    if (cancelReason == CancelReason.DAMAGED) {
+      refundRequest.setRefundAmount(BigDecimal.valueOf(refundAmount));
+
+      return BigDecimal.valueOf(refundAmount);
+    }
     return null;
   }
 
