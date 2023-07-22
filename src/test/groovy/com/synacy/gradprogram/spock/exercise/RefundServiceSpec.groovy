@@ -18,7 +18,7 @@ class RefundServiceSpec extends Specification {
         request = new CancelOrderRequest(reason: CancelReason.DAMAGED)
 
         when:
-        BigDecimal refund = refundService.calculateRefund(request)
+        BigDecimal refund = refundService.calculateRefund(request, order)
 
         then:
         order.getTotalCost() as BigDecimal == refund
