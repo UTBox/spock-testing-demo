@@ -27,8 +27,9 @@ public class RefundService {
     return diff / (24 * 60 * 60 * 1000);
   }
 
-  private void createAndSaveRefundRequest() {
+  private void createAndSaveRefundRequest(RefundRequest refundRequest) {
     // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
+
   }
 
 }
