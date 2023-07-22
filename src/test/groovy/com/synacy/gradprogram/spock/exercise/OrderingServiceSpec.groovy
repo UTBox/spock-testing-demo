@@ -11,7 +11,7 @@ class OrderingServiceSpec extends Specification {
         orderingService = new OrderingService(orderRepository)
     }
 
-    def "CancelOrder should set OrderStatus to CANCELLED for orders with status PENDING and FOR_DELIVERY"() {
+    def "cancelOrder should set OrderStatus to CANCELLED for orders with status PENDING and FOR_DELIVERY"() {
         given:
         CancelOrderRequest request = Mock(CancelOrderRequest)
 
@@ -19,11 +19,27 @@ class OrderingServiceSpec extends Specification {
         orderingService.cancelOrder(request, order)
 
         then:
-        order.getStatus() == OrderStatus.CANCELLED
+        expectedStatus == order.getStatus()
 
         where:
         order                                        |          expectedStatus
         new Order(status: OrderStatus.PENDING)       |   OrderStatus.CANCELLED
         new Order(status: OrderStatus.FOR_DELIVERY)  |   OrderStatus.CANCELLED
+    }
+
+    def "cancelOrder should throw UnableToCancelException if OrderStatus is not PENDING or FOR_DELIVERY"() {
+        given:
+        CancelOrderRequest request = Mock(CancelOrderRequest)
+
+        when:
+        orderingService.cancelOrder(request, order)
+
+        then:
+        thrown(expectedStatus)
+
+        where:
+        order                                     |            expectedStatus
+        new Order(status: OrderStatus.CANCELLED)  |   UnableToCancelException
+        new Order(status: OrderStatus.DELIVERED)  |   UnableToCancelException
     }
 }
