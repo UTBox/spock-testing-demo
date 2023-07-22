@@ -66,7 +66,7 @@ public class OrderingService {
     return order;
   }
 
-  public void cancelOrder(CancelOrderRequest request) {
+  public void cancelOrder(CancelOrderRequest request, Order order) {
     // TODO: Implement me. Cancels PENDING and FOR_DELIVERY orders and create a refund request saving it to the database.
     //  Else throws an UnableToCancelException
   }
