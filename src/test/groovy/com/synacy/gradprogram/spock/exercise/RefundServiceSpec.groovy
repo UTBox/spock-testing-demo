@@ -5,7 +5,7 @@ import spock.lang.Specification
 class RefundServiceSpec extends Specification {
 
     RefundService refundService
-    DateUtils dateUtils
+    DateUtils dateUtils = new DateUtils()
 
     void setup() {
         refundService = new RefundService()
@@ -14,7 +14,7 @@ class RefundServiceSpec extends Specification {
 
     def "calculateRefund should return full total cost if cancel reason is DAMAGED"() {
         given:
-        Order order = new Order(totalCost: 100)
+        Order order = new Order(totalCost: 100, dateOrdered: dateUtils.getCurrentDate())
         CancelOrderRequest request = new CancelOrderRequest(reason: CancelReason.DAMAGED)
 
         when:
