@@ -5,10 +5,12 @@ import spock.lang.Specification
 class OrderingServiceSpec extends Specification {
     OrderingService orderingService
     OrderRepository orderRepository
+    RefundService refundService
 
     void setup() {
         orderRepository = Mock(OrderRepository)
-        orderingService = new OrderingService(orderRepository)
+        refundService = Mock(RefundService)
+        orderingService = new OrderingService(orderRepository, refundService)
     }
 
     def "cancelOrder should set OrderStatus to CANCELLED for orders with status PENDING and FOR_DELIVERY"() {
@@ -41,5 +43,28 @@ class OrderingServiceSpec extends Specification {
         order                                     |            expectedStatus
         new Order(status: OrderStatus.CANCELLED)  |   UnableToCancelException
         new Order(status: OrderStatus.DELIVERED)  |   UnableToCancelException
+    }
+
+    def "cancelOrder should create a refund request and save it to database"() {
+        given:
+        Order order = new Order(totalCost: 100, dateOrdered: new Date(), recipientName: "John Doe", status: OrderStatus.PENDING)
+        CancelOrderRequest request = new CancelOrderRequest(dateCancelled: new Date())
+        BigDecimal refund = 100
+
+        RefundRepository refundRepository = Mock(RefundRepository)
+        RefundService refundService = new RefundService(refundRepository)
+
+        orderingService = new OrderingService(orderRepository, refundService)
+
+        when:
+        orderingService.cancelOrder(request, order)
+
+        then:
+        1 * refundRepository.saveRefundRequest(_) >> { RefundRequest refundRequest ->
+            assert order.recipientName == refundRequest.getRecipientName()
+            assert order.getId() == refundRequest.getOrderId()
+            assert refund == refundRequest.getRefundAmount()
+            assert RefundRequestStatus.TO_PROCESS == refundRequest.getStatus()
+        }
     }
 }

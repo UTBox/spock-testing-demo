@@ -5,9 +5,11 @@ import java.util.Date;
 public class OrderingService {
 
   private final OrderRepository orderRepository;
+  private final RefundService refundService;
 
-  public OrderingService(OrderRepository orderRepository) {
+  public OrderingService(OrderRepository orderRepository, RefundService refundService) {
     this.orderRepository = orderRepository;
+    this.refundService = refundService;
   }
 
   public boolean cartContainsFoodItem(Cart cart) {
