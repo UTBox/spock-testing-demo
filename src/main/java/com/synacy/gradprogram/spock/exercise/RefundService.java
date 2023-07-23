@@ -9,9 +9,8 @@ public class RefundService {
     // TODO: Implement me. Full refund if cancel reason is due to damaged item.
     //  Also full refund if the order was cancelled within 3 days of order date, else refund half of the total cost.
     double refundAmount =  order.getTotalCost();
-    Date threeDaysAgo = order.getDateOrdered();
-    boolean within3Days = order.getDateOrdered().after(threeDaysAgo);
-    if (cancelReason == CancelReason.DAMAGED || within3Days) {
+    boolean isMoreThanThreeDaysAgo = DateUtils.isMoreThanThreeDaysAgo(order.getDateOrdered());
+    if (cancelReason == CancelReason.DAMAGED || isMoreThanThreeDaysAgo) {
       refundRequest.setRefundAmount(BigDecimal.valueOf(refundAmount));
 
       return BigDecimal.valueOf(refundAmount);
