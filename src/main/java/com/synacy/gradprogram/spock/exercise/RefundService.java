@@ -1,7 +1,6 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 public class RefundService {
 
