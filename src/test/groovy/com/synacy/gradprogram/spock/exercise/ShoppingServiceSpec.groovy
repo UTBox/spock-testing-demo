@@ -21,16 +21,45 @@ class ShoppingServiceSpec extends Specification {
 
     def "buyNonSpoilingItemsInCart should be able to create delivery order"(){
         given:
-            User user = new User()
-            String firstname = user.setFirstName("Clark")
-            String lastname = user.setLastName("Tabar")
+        Item nuggets = new Item("Nuggets", 50.0, ItemType.FOOD)
+        Item ham = new Item("Ham", 80.0, ItemType.FOOD)
+        Item biscuit = new Item("Biscuit", 50.0, ItemType.GADGET)
+        Item appleJuice = new Item("Apple Juice", 150.0, ItemType.FOOD)
+        Item milk = new Item("Milk", 100.0, ItemType.FOOD)
+        Item chocolate = new Item("Chocolate", 300.0, ItemType.FOOD)
 
-            String recipient = firstname.concat("").concat(lastname)
+        List<Item> items = [nuggets, ham, biscuit, appleJuice, milk, chocolate]
 
-            Order order
+        Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
 
+        User user = new User()
+
+        user.setFirstName("Clark")
+        user.setLastName("Tabar")
+        String address = "Cebu"
+
+
+
+        //boolean containsFoodItems =  orderingService.cartContainsFoodItem(false)
+
+        String recipient = user.getFirstName().concat(" ").concat(user.getLastName())
+        Order createOrder = orderingService.createAnOrder (itemsInTheCart, recipient, address, false)
+
+
+
+        when:
+        service.buyNonSpoilingItemsInCart(itemsInTheCart, user)
+
+        then:
+        1 * deliveryService.createDelivery(_){ DeliveryRequestRepository deliveryRequestRepository ->
+            assert createOrder == orderingService.createAnOrder()
+            assert recipient == createOrder.getRecipientName()
+
+        }
 
     }
+
+
 
 
 }
