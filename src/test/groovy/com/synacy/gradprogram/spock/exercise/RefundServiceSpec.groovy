@@ -8,7 +8,7 @@ class RefundServiceSpec extends Specification {
     RefundRequest refundRequest
     RefundRepository refundRepository = Mock(RefundRepository)
     void setup() {
-        service = new RefundService()
+        service = new RefundService(refundRepository)
         refundRequest = new RefundRequest()
     }
 
@@ -64,7 +64,7 @@ class RefundServiceSpec extends Specification {
         service.createAndSaveRefundRequest(orderId, recipientName, refundAmount)
 
         then:
-        1 * refundRepository.saveRefundRequest(_) { RefundRequest refundRequest ->
+        1 * refundRepository.saveRefundRequest(_) >> { RefundRequest refundRequest ->
             assert orderId == refundRequest.getOrderId()
             assert recipientName == refundRequest.getRecipientName()
             assert refundAmount == refundRequest.getRefundAmount()

@@ -1,8 +1,15 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class RefundService {
+
+  private final RefundRepository refundRepository;
+
+  public RefundService(RefundRepository refundRepository) {
+    this.refundRepository = refundRepository;
+  }
 
   public BigDecimal calculateRefund(CancelReason cancelReason, Order order, RefundRequest refundRequest) {
     double refundAmount =  order.getTotalCost();
@@ -19,8 +26,14 @@ public class RefundService {
 
     return BigDecimal.valueOf(refundAmount/2);
   }
-  private void createAndSaveRefundRequest() {
+  private void createAndSaveRefundRequest(UUID orderId, String recipientName, BigDecimal refundAmount) {
     // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
-  }
+    RefundRequest refundRequest = new RefundRequest();
+    refundRequest.setOrderId(orderId);
+    refundRequest.setRecipientName(recipientName);
+    refundRequest.setRefundAmount(refundAmount);
+    refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
 
+    refundRepository.saveRefundRequest(refundRequest);
+  }
 }
