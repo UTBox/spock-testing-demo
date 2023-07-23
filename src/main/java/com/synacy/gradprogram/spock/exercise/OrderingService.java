@@ -91,7 +91,7 @@ public class OrderingService {
 
       refundRepository.saveRefundRequest(refundRequest);
     } else {
-      throw new UnableToCancelException("Order status is not eligible for cancellation.");
+      throw new UnableToCancelException("Unable to cancel order: Invalid order status for cancellation.");
     }
 
   }

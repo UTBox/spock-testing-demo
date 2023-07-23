@@ -27,4 +27,21 @@ class OrderingServiceTestSpec extends Specification {
         1 * refundRepository.saveRefundRequest(_)
         1 * orderRepository.fetchOrderById(orderId) >> Optional.of(new Order())
     }
+
+    def "Should throw UnableToCancelException for DELIVERED order"() {
+        given:
+        CancelOrderRequest request = new CancelOrderRequest()
+        request.setOrderId(UUID.randomUUID())
+        request.setReason(CancelReason.DAMAGED)
+        request.setDateCancelled(new Date())
+
+        when:
+        orderingService.cancelOrder(request, OrderStatus.DELIVERED)
+
+        then:
+        def exception = thrown(UnableToCancelException)
+        exception.message == "Unable to cancel order: Invalid order status for cancellation."
+    }
+
+
 }
