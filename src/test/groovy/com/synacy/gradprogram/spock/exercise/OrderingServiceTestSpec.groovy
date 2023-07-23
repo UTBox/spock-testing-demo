@@ -21,7 +21,7 @@ class OrderingServiceTestSpec extends Specification {
         request.setDateCancelled(new Date())
 
         when:
-        orderingService.cancelOrder(request, OrderStatus.PENDING)
+        orderingService.cancelOrder(request, OrderStatus.FOR_DELIVERY)
 
         then:
         1 * refundRepository.saveRefundRequest(_)

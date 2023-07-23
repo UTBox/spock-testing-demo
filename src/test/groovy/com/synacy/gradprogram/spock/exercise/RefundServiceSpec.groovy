@@ -26,6 +26,7 @@ class RefundServiceSpec extends Specification {
 
         then:
         totalRefund == totalCost
+        println(totalRefund)
     }
 
     def "Should return half refund for other cancellation reasons"() {
@@ -33,7 +34,7 @@ class RefundServiceSpec extends Specification {
         refundRequest.isDamagedItem() >> false
         refundService.daysBetween(_, _) >> 4
         refundRequest.getCancelReason() >> CancelReason.WRONG_ITEM
-        BigDecimal totalCost = new BigDecimal("50.00")
+        BigDecimal totalCost = new BigDecimal("100.00")
         BigDecimal expectedRefund = totalCost.divide(new BigDecimal("2"))
 
 
@@ -42,6 +43,7 @@ class RefundServiceSpec extends Specification {
 
         then:
         totalRefund == expectedRefund
+        println(totalRefund)
     }
 
     def "createAndSaveRefundRequest Should save if the Refund Request Status is TO_PROCESS"(){

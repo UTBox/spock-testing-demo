@@ -12,7 +12,8 @@ public class RefundService {
     this.refundRequestStatus = refundRequestStatus;
   }
   public BigDecimal calculateRefund(Date orderDate, CancelReason cancelReason, BigDecimal totalCost) {
-
+// TODO: Implement me. Full refund if cancel reason is due to damaged item.
+    //  Also full refund if the order was cancelled within 3 days of order date, else refund half of the total cost.
     long daysSinceOrder = daysBetween(orderDate, new Date());
 
     if (cancelReason == CancelReason.DAMAGED || daysSinceOrder <=3){
