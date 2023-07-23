@@ -28,7 +28,7 @@ class RefundServiceSpec extends Specification {
         given:
         CancelReason cancelReason = CancelReason.DAMAGED
         Date threeDaysAgo = new DateUtils().currentDate
-        Order order = new Order(totalCost: 100.0, dateOrdered: new Date())
+        Order order = new Order(totalCost: 100.0, dateOrdered: threeDaysAgo)
 
         when:
         BigDecimal result = service.calculateRefund(cancelReason, order, refundRequest)
