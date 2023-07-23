@@ -1,13 +1,21 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.util.Date;
+import java.util.Optional;
+import java.math.BigDecimal;
+
+
 
 public class OrderingService {
 
   private final OrderRepository orderRepository;
+  private RefundRepository refundRepository;
+  private RefundService refundService;
 
-  public OrderingService(OrderRepository orderRepository) {
+
+  public OrderingService(OrderRepository orderRepository, RefundRepository refundRepository) {
     this.orderRepository = orderRepository;
+    this.refundRepository = refundRepository;
   }
 
   public boolean cartContainsFoodItem(Cart cart) {
@@ -36,7 +44,7 @@ public class OrderingService {
     int itemCountDiscountThreshold = 5;
 
     return totalPrice > discountTotalAmountThreshold
-        && cart.getItems().size() > itemCountDiscountThreshold;
+            && cart.getItems().size() > itemCountDiscountThreshold;
   }
 
   public void applyDiscountToCartItems(Cart cart) {
@@ -66,8 +74,25 @@ public class OrderingService {
     return order;
   }
 
-  public void cancelOrder(CancelOrderRequest request) {
+  public void cancelOrder(CancelOrderRequest request, OrderStatus orderStatus) {
     // TODO: Implement me. Cancels PENDING and FOR_DELIVERY orders and create a refund request saving it to the database.
     //  Else throws an UnableToCancelException
+    if (orderStatus == OrderStatus.PENDING || orderStatus == OrderStatus.FOR_DELIVERY) {
+      Optional<Order> optionalOrder = orderRepository.fetchOrderById(request.getOrderId());
+
+      // Check if order exists in the Optional, otherwise throw an UnableToCancelException
+      Order order = optionalOrder.orElseThrow(() -> new UnableToCancelException("Order not found."));
+
+      RefundRequest refundRequest = new RefundRequest();
+      refundRequest.setOrderId(order.getId());
+      refundRequest.setRecipientName(order.getRecipientName());
+      refundRequest.setRefundAmount(new BigDecimal(order.getTotalCost()));
+      refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
+
+      refundRepository.saveRefundRequest(refundRequest);
+    } else {
+      throw new UnableToCancelException("Order status is not eligible for cancellation.");
+    }
+
   }
 }

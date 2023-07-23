@@ -4,25 +4,27 @@ import spock.lang.Specification
 
 class OrderingServiceTestSpec extends Specification {
     OrderingService orderingService
-    RefundRequest refundRequest = Mock(RefundRequest)
-    OrderRepository orderRepository = Mock(OrderRepository)
     RefundRepository refundRepository = Mock(RefundRepository)
+    OrderRepository orderRepository = Mock(OrderRepository)
 
     void setup() {
-        orderingService = new OrderingService(orderRepository,refundRepository)
+        orderingService = new OrderingService(orderRepository, refundRepository)
+        orderRepository.fetchOrderById(_) >> Optional.empty()
     }
 
     def "CancelOrder Should cancel PENDING and FOR_DELIVERY orders and create a refund request"() {
         given:
-        CancelOrderRequest cancelOrderRequest = new CancelOrderRequest()
-        cancelOrderRequest.setOrderId(UUID.randomUUID())
-        cancelOrderRequest.setReason(CancelReason.DAMAGED)
-        cancelOrderRequest.setDateCancelled(new Date())
+        CancelOrderRequest request = new CancelOrderRequest()
+        UUID orderId = UUID.randomUUID()
+        request.setOrderId(orderId)
+        request.setReason(CancelReason.DAMAGED)
+        request.setDateCancelled(new Date())
 
         when:
-        orderingService.cancelOrder(cancelOrderRequest)
+        orderingService.cancelOrder(request, OrderStatus.PENDING)
 
         then:
         1 * refundRepository.saveRefundRequest(_)
+        1 * orderRepository.fetchOrderById(orderId) >> Optional.of(new Order())
     }
 }
