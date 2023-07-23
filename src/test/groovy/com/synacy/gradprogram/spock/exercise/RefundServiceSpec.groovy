@@ -49,6 +49,6 @@ class RefundServiceSpec extends Specification {
 
         then:
         result == BigDecimal.valueOf(50.0)
-        refundRequest.refundAmount = BigDecimal.valueOf(50.0)
+        refundRequest.refundAmount == BigDecimal.valueOf(50.0)
     }
 }

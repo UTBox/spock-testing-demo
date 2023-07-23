@@ -14,8 +14,13 @@ public class RefundService {
       refundRequest.setRefundAmount(BigDecimal.valueOf(refundAmount));
 
       return BigDecimal.valueOf(refundAmount);
+    } else if (cancelReason == CancelReason.WRONG_ITEM) {
+      refundRequest.setRefundAmount(BigDecimal.valueOf(refundAmount/2));
+
+      return BigDecimal.valueOf(refundAmount/2);
     }
-    return null;
+
+    return BigDecimal.valueOf(refundAmount/2);
   }
   private void createAndSaveRefundRequest() {
     // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
