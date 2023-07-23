@@ -11,12 +11,20 @@ public class DateUtils {
 
   public static boolean isMoreThanThreeDaysAgo(Date date) {
     Calendar threeDaysAgo = Calendar.getInstance();
-    threeDaysAgo.add(Calendar.DAY_OF_YEAR, 3);
+    threeDaysAgo.add(Calendar.DAY_OF_MONTH, 3);
 
     Calendar targetDate = Calendar.getInstance();
     targetDate.setTime(date);
 
     return targetDate.before(threeDaysAgo);
+
+  }
+
+  public static Date subtractDays(Date date, int days) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(date);
+    calendar.add(Calendar.DAY_OF_MONTH, days);
+    return calendar.getTime();
   }
 
 }

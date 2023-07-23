@@ -27,13 +27,14 @@ class RefundServiceSpec extends Specification {
     def "calculateRefund should give full refund when cancel within 3 days"() {
         given:
         CancelReason cancelReason = CancelReason.DAMAGED
-        Date threeDaysAgo = new DateUtils().currentDate
-        Order order = new Order(totalCost: 100.0, dateOrdered: threeDaysAgo)
+        Order order = new Order(totalCost: 100.0, dateOrdered: DateUtils.subtractDays(new Date(), 3))
+        boolean isMoreThanThreeDays = DateUtils.isMoreThanThreeDaysAgo(order.dateOrdered)
 
         when:
         BigDecimal result = service.calculateRefund(cancelReason, order, refundRequest)
 
         then:
+        isMoreThanThreeDays
         result == BigDecimal.valueOf(100.0)
         refundRequest.refundAmount == BigDecimal.valueOf(100.0)
     }
