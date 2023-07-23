@@ -5,28 +5,22 @@ import spock.lang.Specification
 class RefundServiceSpec extends Specification {
 
     RefundService service
-    OrderingService orderingService = Mock(OrderingService)
     RefundRequest refundRequest
     void setup() {
-        service = new RefundService(orderingService)
+        service = new RefundService()
         refundRequest = new RefundRequest()
     }
 
     def "calculateRefund should give full refund due to damage item cancel reason"() {
         given:
-        List<Item> items = [new Item("Fried Chicken", 50.00d, ItemType.FOOD),
-                            new Item("Nike", 500.00d, ItemType.CLOTHING),
-                            new Item("Rice Cooker", 300.75d, ItemType.APPLIANCE),
-                            new Item("IPhone", 23000.00d, ItemType.GADGET)]
-        double totalCost = 23650.75d
-        Cart cart = new Cart(UUID.randomUUID(), items)
-        orderingService.calculateTotalCostOfCart(cart) >> totalCost
+        CancelReason cancelReason = CancelReason.DAMAGED
+        Order order = new Order(totalCost: 100.0, dateOrdered: new Date())
 
         when:
-        BigDecimal refundAmount = service.calculateRefund(CancelReason.DAMAGED, cart, refundRequest)
+        BigDecimal result = service.calculateRefund(cancelReason, order, refundRequest)
 
         then:
-        refundAmount == BigDecimal.valueOf(totalCost)
-        refundRequest.getRefundAmount() == BigDecimal.valueOf(totalCost)
+        result == BigDecimal.valueOf(100.0)
+        refundRequest.refundAmount == BigDecimal.valueOf(100.0)
     }
 }
