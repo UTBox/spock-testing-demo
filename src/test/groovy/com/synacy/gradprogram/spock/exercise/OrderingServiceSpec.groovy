@@ -31,4 +31,19 @@ class OrderingServiceSpec extends Specification {
         where:
         status << [OrderStatus.PENDING, OrderStatus.FOR_DELIVERY]
     }
+
+    def "cancelOrder should throw UnableToCancelException for other order status"() {
+        given:
+        Order order = new Order(status: status)
+
+        when:
+        orderingService.cancelOrder(new CancelOrderRequest(), order)
+
+        then:
+        UnableToCancelException unableToCancelException = thrown(UnableToCancelException)
+        unableToCancelException.message == "Unable to cancel order"
+
+        where:
+        status << [OrderStatus.DELIVERED, OrderStatus.CANCELLED]
+    }
 }
