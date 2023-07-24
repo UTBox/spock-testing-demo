@@ -106,7 +106,6 @@ class OrderingServiceTest extends Specification {
         Item itemForDiscount1 = new Item("cookie", 200.0, ItemType.FOOD)
         Item itemForDiscount2 = new Item("phone", 1000.0, ItemType.GADGET)
         List itemListForDiscount = [itemForDiscount1, itemForDiscount2]
-        List expectedCostOfItems = [200.0d, 1000.0d]
 
         Cart cartForDiscount = new Cart(UUID.randomUUID(), itemListForDiscount)
 
@@ -114,8 +113,8 @@ class OrderingServiceTest extends Specification {
         orderingService.applyDiscountToCartItems(cartForDiscount)
 
         then:
-        expectedCostOfItems.get(0) == cartForDiscount.getItems().get(0).getCost()
-        expectedCostOfItems.get(1) == cartForDiscount.getItems().get(1).getCost()
+        200.0d == cartForDiscount.getItems().get(0).getCost()
+        1000.0d == cartForDiscount.getItems().get(1).getCost()
     }
 
     def "applyDiscountToCartItems should set cost of each item in cart to 10 percent of original"() {

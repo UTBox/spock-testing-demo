@@ -1,7 +1,6 @@
 package com.synacy.gradprogram.spock.exercise
 
 import spock.lang.Specification
-import spock.lang.Unroll
 
 class DeliveryServiceSpec extends Specification {
 
@@ -17,7 +16,7 @@ class DeliveryServiceSpec extends Specification {
         deliveryService = new DeliveryService(dateUtils, deliveryRequestRepository)
     }
 
-    def "CreateDelivery should save OrderID, DeliveryDate and Courier to deliveryRequestRepository"() {
+    def "CreateDelivery should create and save a delivery request with correct values"() {
         given:
         UUID expectedId = UUID.randomUUID()
         order.getId() >> expectedId

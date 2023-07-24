@@ -28,7 +28,33 @@ class ShoppingServiceSpec extends Specification {
                 orderRepository, deliveryRequestRepository)
     }
 
-    def "BuyNonSpoilingItemsInCart should check if discount applies to cart and save a delivery request"() {
+    def "BuyNonSpoilingItemsInCart should check if discount applies to cart"() {
+        given:
+        user.getFirstName() >> "John"
+        user.getLastName() >> "Doe"
+        user.getAddress() >> "Philippines"
+
+        when:
+        shoppingService.buyNonSpoilingItemsInCart(cart, user)
+
+        then:
+        1 * orderingService.applyDiscountToCartItems(cart)
+    }
+
+    def "BuyNonSpoilingItemsInCart should create an order based on cart"() {
+        given:
+        user.getFirstName() >> "John"
+        user.getLastName() >> "Doe"
+        user.getAddress() >> "Philippines"
+
+        when:
+        shoppingService.buyNonSpoilingItemsInCart(cart, user)
+
+        then:
+        1 * orderingService.createAnOrder(_,_,_,_)
+    }
+
+    def "BuyNonSpoilingItemsInCart should save a delivery request based on order"() {
         given:
         user.getFirstName() >> "John"
         user.getLastName() >> "Doe"
@@ -40,30 +66,26 @@ class ShoppingServiceSpec extends Specification {
         shoppingService.buyNonSpoilingItemsInCart(cart, user)
 
         then:
-        1 * orderingService.applyDiscountToCartItems(cart)
-
         1 * deliveryService.createDelivery(order)
     }
 
-    def "GetOrderSummary should return an order summary based on UUID"() {
+    def "GetOrderSummary should return an order summary based on order ID"() {
         given:
-        Order testOrder = new Order(totalCost: 10, status: OrderStatus.PENDING)
-        UUID testUuid = testOrder.getId()
+        Order order = Mock(Order)
+        UUID uuid = order.getId()
+        DeliveryRequest deliveryRequest = Mock(DeliveryRequest)
 
-        DeliveryRequest testDeliveryRequest = new DeliveryRequest(orderId: testUuid,
-                deliveryDate: new Date(), courier: Courier.JRS)
-
-        orderRepository.fetchOrderById(testUuid) >> testOrder
-        deliveryRequestRepository.fetchDeliveryRequestByOrderId(testUuid) >> testDeliveryRequest
+        orderRepository.fetchOrderById(uuid) >> order
+        deliveryRequestRepository.fetchDeliveryRequestByOrderId(uuid) >> deliveryRequest
 
         when:
-        OrderSummary orderSummary = shoppingService.getOrderSummary(testUuid)
+        OrderSummary orderSummary = shoppingService.getOrderSummary(uuid)
 
         then:
-        testOrder.getTotalCost() == orderSummary.getTotalCost()
-        testOrder.getStatus() == orderSummary.getStatus()
-        testDeliveryRequest.getDeliveryDate() == orderSummary.getDeliveryDate()
-        testDeliveryRequest.getCourier() == orderSummary.getCourier()
+        order.getTotalCost() == orderSummary.getTotalCost()
+        order.getStatus() == orderSummary.getStatus()
+        deliveryRequest.getDeliveryDate() == orderSummary.getDeliveryDate()
+        deliveryRequest.getCourier() == orderSummary.getCourier()
     }
 
 }
