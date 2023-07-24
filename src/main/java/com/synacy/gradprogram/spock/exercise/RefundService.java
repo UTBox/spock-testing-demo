@@ -11,7 +11,8 @@ public class RefundService {
   }
 
   public BigDecimal calculateRefund(CancelOrderRequest request, Order order) {
-    long refundDateLimit = order.getDateOrdered().getTime() + (86400000 * 3);
+    long millisecondsInThreeDays = 86400000 * 3;
+    long refundDateLimit = order.getDateOrdered().getTime() + millisecondsInThreeDays;
     BigDecimal refundAmount;
 
     if (request.getReason() == CancelReason.DAMAGED || request.getDateCancelled().getTime() < refundDateLimit) {
