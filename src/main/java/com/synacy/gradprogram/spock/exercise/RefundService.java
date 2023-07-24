@@ -6,19 +6,27 @@ import java.util.UUID;
 public class RefundService {
 
   private final RefundRepository refundRepository;
+  private final RefundRequest refundRequest;
 
-  public RefundService(RefundRepository refundRepository) {
+  public RefundService(RefundRepository refundRepository, RefundRequest refundRequest) {
     this.refundRepository = refundRepository;
+    this.refundRequest = refundRequest;
   }
 
-  public BigDecimal calculateRefund(CancelReason cancelReason, Order order, RefundRequest refundRequest) {
+  public BigDecimal calculateRefund(CancelReason cancelReason, Order order) {
     double refundAmount =  order.getTotalCost();
     boolean isMoreThanThreeDaysAgo = DateUtils.isMoreThanThreeDaysAgo(order.getDateOrdered());
     if (cancelReason == CancelReason.DAMAGED || isMoreThanThreeDaysAgo) {
+      refundRequest.setOrderId(order.getId());
+      refundRequest.setRecipientName(order.getRecipientName());
+      refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
       refundRequest.setRefundAmount(BigDecimal.valueOf(refundAmount));
 
       return BigDecimal.valueOf(refundAmount);
     } else if (cancelReason == CancelReason.WRONG_ITEM) {
+      refundRequest.setOrderId(order.getId());
+      refundRequest.setRecipientName(order.getRecipientName());
+      refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
       refundRequest.setRefundAmount(BigDecimal.valueOf(refundAmount/2));
 
       return BigDecimal.valueOf(refundAmount/2);
