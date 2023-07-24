@@ -20,12 +20,10 @@ public class RefundService {
       refundAmount = BigDecimal.valueOf(order.getTotalCost()/2);
     }
 
-    createAndSaveRefundRequest(order, refundAmount);
-
     return refundAmount;
   }
 
-  private void createAndSaveRefundRequest(Order order, BigDecimal refundAmount) {
+  public void createAndSaveRefundRequest(Order order, BigDecimal refundAmount) {
     RefundRequest refundRequest = new RefundRequest();
 
     refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);

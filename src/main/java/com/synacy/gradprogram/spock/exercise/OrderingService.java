@@ -1,5 +1,6 @@
 package com.synacy.gradprogram.spock.exercise;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class OrderingService {
@@ -75,6 +76,9 @@ public class OrderingService {
     } else {
       throw new UnableToCancelException();
     }
-    refundService.calculateRefund(request, order);
+
+    BigDecimal refundAmount = refundService.calculateRefund(request, order);
+
+    refundService.createAndSaveRefundRequest(order, refundAmount);
   }
 }

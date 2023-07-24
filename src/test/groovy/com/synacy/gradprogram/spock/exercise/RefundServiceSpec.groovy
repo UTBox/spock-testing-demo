@@ -59,14 +59,13 @@ class RefundServiceSpec extends Specification {
         order.getTotalCost()/2 as BigDecimal == refund
     }
 
-    def "calculateRefund should save a TO_PROCESS refund request with correct values"() {
+    def "createAndSaveRefundRequest should save a TO_PROCESS refund request with correct values"() {
         given:
         Order order = new Order(totalCost: 100, dateOrdered: new Date(), recipientName: "John Doe")
-        CancelOrderRequest request = new CancelOrderRequest(dateCancelled: new Date())
         BigDecimal refund = 100
 
         when:
-        refundService.calculateRefund(request, order)
+        refundService.createAndSaveRefundRequest(order, refund)
 
         then:
         1 * refundRepository.saveRefundRequest(_) >> { RefundRequest refundRequest ->
