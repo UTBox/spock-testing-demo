@@ -14,7 +14,7 @@ class RefundServiceSpec extends Specification {
         given:
         Order order = new Order(status: OrderStatus.CANCELLED, totalCost: 100.0)
         CancelOrderRequest cancelOrderRequest = new CancelOrderRequest(reason: CancelReason.DAMAGED)
-        BigDecimal fullAmount = 100
+        BigDecimal fullAmount = new BigDecimal("100")
 
         when:
         BigDecimal refund = refundService.calculateRefund(cancelOrderRequest, order)
@@ -28,7 +28,7 @@ class RefundServiceSpec extends Specification {
         given:
         Order order = new Order(status: OrderStatus.CANCELLED, totalCost: 100.0, dateOrdered: DateUtils.getDaysBeforeDate(-2))
         CancelOrderRequest cancelOrderRequest = new CancelOrderRequest(reason: CancelReason.DAMAGED)
-        BigDecimal fullAmount = 100
+        BigDecimal fullAmount = new BigDecimal("100")
 
         when:
         BigDecimal refund = refundService.calculateRefund(cancelOrderRequest, order)
@@ -41,7 +41,7 @@ class RefundServiceSpec extends Specification {
         given:
         Order order = new Order(status: OrderStatus.CANCELLED, totalCost: 100.0)
         CancelOrderRequest cancelOrderRequest = new CancelOrderRequest(reason: CancelReason.WRONG_ITEM)
-        BigDecimal halfAmount = 50
+        BigDecimal halfAmount = new BigDecimal("50")
 
         when:
         BigDecimal refund = refundService.calculateRefund(cancelOrderRequest, order)
@@ -53,8 +53,8 @@ class RefundServiceSpec extends Specification {
     def "CalculateRefund should return half refund if order was cancelled after 3 days of order date"() {
         given:
         Order order = new Order(status: OrderStatus.CANCELLED, totalCost: 100.0, dateOrdered: DateUtils.getDaysBeforeDate(-5))
-        CancelOrderRequest cancelOrderRequest = new CancelOrderRequest(reason: CancelReason.DAMAGED)
-        BigDecimal halfAmount = 50
+        CancelOrderRequest cancelOrderRequest = new CancelOrderRequest(reason: CancelReason.WRONG_ITEM)
+        BigDecimal halfAmount = new BigDecimal(50)
 
         when:
         BigDecimal refund = refundService.calculateRefund(cancelOrderRequest, order)

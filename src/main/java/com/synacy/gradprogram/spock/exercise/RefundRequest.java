@@ -37,7 +37,7 @@ public class RefundRequest {
     return status;
   }
 
-  public void setStatus(RefundRequestStatus status) {
+  public void setStatus(RefundRequestStatus toProcess) {
     this.status = status;
   }
 }

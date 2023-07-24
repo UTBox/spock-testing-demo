@@ -1,17 +1,36 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Date;
 
 public class RefundService {
 
+  private final RefundRepository refundRepository;
+
+  private RefundService(RefundRepository refundRepository) {
+    this.refundRepository = refundRepository;
+  }
   public BigDecimal calculateRefund(CancelOrderRequest request, Order order) {
-    // TODO: Implement me. Full refund if cancel reason is due to damaged item.
-    //  Also full refund if the order was cancelled within 3 days of order date, else refund half of the total cost.
-    return null;
+    Date dateOrdered = order.getDateOrdered();
+    BigDecimal halfAmount = BigDecimal.valueOf(order.getTotalCost()).divide(BigDecimal.valueOf(2), RoundingMode.HALF_UP);
+
+    if(request.getReason() == CancelReason.WRONG_ITEM ){
+      return halfAmount;
+    }else if(request.getReason() == CancelReason.DAMAGED || DateUtils.isWithinThreeDays(dateOrdered)){
+      return BigDecimal.valueOf(order.getTotalCost());
+    }
+    return halfAmount;
   }
 
-  private void createAndSaveRefundRequest() {
-    // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
+  private void createAndSaveRefundRequest(Order order, BigDecimal refundAmount) {
+    RefundRequest request = new RefundRequest();
+    request.setRecipientName(order.getRecipientName());
+    request.setOrderId(order.getId());
+    request.setRefundAmount(refundAmount);
+    request.setStatus(RefundRequestStatus.TO_PROCESS);
+
+    refundRepository.saveRefundRequest(request);
   }
 
 }
