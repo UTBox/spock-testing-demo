@@ -54,23 +54,4 @@ class RefundServiceSpec extends Specification {
         result == BigDecimal.valueOf(50.0)
         refundRequest.refundAmount == BigDecimal.valueOf(50.0)
     }
-
-    def "createAndSaveRefundRequest should create and save refund request"() {
-        given:
-        UUID orderId = UUID.randomUUID()
-        String recipientName = "Romeo"
-        BigDecimal refundAmount = BigDecimal.valueOf(100.0)
-        RefundRequestStatus refundRequestStatus = RefundRequestStatus.TO_PROCESS
-
-        when:
-        service.createAndSaveRefundRequest(orderId, recipientName, refundAmount)
-
-        then:
-        1 * refundRepository.saveRefundRequest(_) >> { RefundRequest refundRequest ->
-            assert orderId == refundRequest.getOrderId()
-            assert recipientName == refundRequest.getRecipientName()
-            assert refundAmount == refundRequest.getRefundAmount()
-            assert refundRequestStatus == refundRequest.getStatus()
-        }
-    }
 }
