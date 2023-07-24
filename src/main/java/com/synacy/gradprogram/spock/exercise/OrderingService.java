@@ -67,8 +67,11 @@ public class OrderingService {
   }
 
   public void cancelOrder(CancelOrderRequest request, Order order) throws UnableToCancelException {
-    // TODO: Implement me. Cancels PENDING and FOR_DELIVERY orders and create a refund request saving it to the database.
-    //  Else throws an UnableToCancelException
-
+    if(order.getStatus() == OrderStatus.PENDING || order.getStatus() == OrderStatus.FOR_DELIVERY){
+      order.setStatus(OrderStatus.CANCELLED);
+      orderRepository.saveOrder(order);
+    }else{
+      throw new UnableToCancelException("Cannot Cancel Order");
+    }
   }
 }

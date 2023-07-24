@@ -32,7 +32,7 @@ class OrderingServiceSpec extends Specification {
         orderingService.cancelOrder(cancelOrderRequest, order)
 
         then:
-        1 * orderRepository.saveOrder(cancelOrderRequest, order)
+        1 * orderRepository.saveOrder(order)
 
     }
     def "cancelOrder should throw UnableToCancelException when order status request is not PENDING or FOR_DELIVERY"() {
