@@ -11,45 +11,37 @@ class OrderingServiceSpec extends Specification {
         orderingService = new OrderingService(orderRepository)
     }
 
-    def "cancelOrder should cancel PENDING orders and create refund request saving it to the database"(){
+    def "cancelOrder should change status of order from  PENDING to CANCELLED and create refund request saving it to the database"(){
         given:
-        UUID orderId = UUID.randomUUID()
-        Order order = new Order(id: orderId, status: OrderStatus.PENDING, totalCost: 50.0)
-
-        CancelOrderRequest cancelOrderRequest = new CancelOrderRequest(orderId: orderId, reason: CancelReason.DAMAGED, dateCancelled: new Date())
+        Order order = new Order(status: OrderStatus.PENDING, totalCost: 50.0)
+        CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
 
         when:
-        orderingService.cancelOrder(cancelOrderRequest)
+        orderingService.cancelOrder(cancelOrderRequest, order)
 
         then:
-        1 * orderCancellationService.saveOrder(pendingOrder)
-        1 * orderCancellationService.createRefundRequest(pendingOrder, pendingCancelRequest.reason, pendingCancelRequest.dateCancelled)
-
+        1 * orderRepository.saveOrder(order)
     }
 
-    def "cancelOrder should cancel FOR_DELIVERY orders and create refund request saving it to the database"(){
+    def "cancelOrder should change statues of order from FOR_DELIVERY to CANCELLED and create refund request saving it to the database"(){
         given:
-        UUID orderId = UUID.randomUUID()
-        Order order = new Order(id: orderId, status: OrderStatus.FOR_DELIVERY, totalCost: 100.0)
-        CancelOrderRequest cancelOrderRequest = new CancelOrderRequest(orderId: orderId, reason: CancelReason.DAMAGED, dateCancelled: new Date())
+        Order order = new Order(status: OrderStatus.FOR_DELIVERY, totalCost: 100.0)
+        CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
 
         when:
-        orderingService.cancelOrder(cancelOrderRequest)
+        orderingService.cancelOrder(cancelOrderRequest, order)
 
         then:
-        1 * orderingService.saveOrder(cancelOrderRequest)
-        1 * orderingService.createRefundRequest(cancelOrderRequest, cancelOrderRequest.reason, cancelOrderRequest.dateCancelled)
-
+        1 * orderRepository.saveOrder(cancelOrderRequest, order)
 
     }
-    def "cancelOrder should throw UnableToCancelException when order request is not PENDING and FOR_DELIVERY"() {
+    def "cancelOrder should throw UnableToCancelException when order status request is not PENDING or FOR_DELIVERY"() {
         given:
-        UUID orderId = UUID.randomUUID()
-        Order order = new Order(id: orderId, status: OrderStatus.DELIVERED, totalCost: 150.0)
-        CancelOrderRequest cancelRequest = new CancelOrderRequest(orderId: orderId, reason: CancelReason.DAMAGED, dateCancelled: new Date())
+        Order order = new Order(status: OrderStatus.DELIVERED, totalCost: 150.0)
+        CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
 
         when:
-        orderingService.cancelOrder(cancelRequest)
+        orderingService.cancelOrder(cancelOrderRequest, order)
 
         then:
         UnableToCancelException exception = thrown(UnableToCancelException)
