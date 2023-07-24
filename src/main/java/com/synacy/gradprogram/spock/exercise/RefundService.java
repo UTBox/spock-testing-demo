@@ -24,8 +24,7 @@ public class RefundService {
 
     return BigDecimal.valueOf(refundAmount/2);
   }
-  private void createAndSaveRefundRequest(UUID orderId, String recipientName, BigDecimal refundAmount) {
-    // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
+  public void createAndSaveRefundRequest(UUID orderId, String recipientName, BigDecimal refundAmount) {
     RefundRequest refundRequest = new RefundRequest();
     refundRequest.setOrderId(orderId);
     refundRequest.setRecipientName(recipientName);

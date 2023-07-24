@@ -9,7 +9,7 @@ class OrderingServiceSpec extends Specification {
     RefundService refundService = Mock(RefundService)
 
     void setup() {
-        orderingService = new OrderingService(orderRepository)
+        orderingService = new OrderingService(orderRepository, refundService)
     }
 
     def "cancelOrder should cancel PENDING and FOR_DELIVERY order and create refund amount and refund request"() {
