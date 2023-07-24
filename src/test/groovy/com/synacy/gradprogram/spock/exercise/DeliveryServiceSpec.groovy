@@ -21,13 +21,12 @@ class DeliveryServiceSpec extends Specification {
         when:
         DeliveryRequest result = deliveryService.createDelivery(order)
         then:
-        1 * dateUtils.getCurrentDate() >> new Date()
         1 * deliveryRequestRepository.saveDeliveryRequest(_)
 
         and:
         result.orderId == order.id
-        result.courier != null
-        result.deliveryDate != null
+        result.courier == Courier.JRS
+        result.deliveryDate == dateUtils.getCurrentDate()
     }
     def "Should return JRS for order total cost less than 20"(){
        when:
