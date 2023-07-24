@@ -78,5 +78,8 @@ public class OrderingService {
 
       orderRepository.saveOrder(order);
     }
+    else {
+      throw new UnableToCancelException("Unable to cancel order");
+    }
   }
 }
