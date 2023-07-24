@@ -1,13 +1,16 @@
 package com.synacy.gradprogram.spock.exercise;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class OrderingService {
 
   private final OrderRepository orderRepository;
+  private final RefundService refundService;
 
-  public OrderingService(OrderRepository orderRepository) {
+  public OrderingService(OrderRepository orderRepository, RefundService refundService) {
     this.orderRepository = orderRepository;
+    this.refundService = refundService;
   }
 
   public boolean cartContainsFoodItem(Cart cart) {
@@ -66,8 +69,14 @@ public class OrderingService {
     return order;
   }
 
-  public void cancelOrder(CancelOrderRequest request) {
-    // TODO: Implement me. Cancels PENDING and FOR_DELIVERY orders and create a refund request saving it to the database.
-    //  Else throws an UnableToCancelException
+  public void cancelOrder(CancelOrderRequest request, Order order) {
+    if (order.getStatus() == OrderStatus.PENDING || order.getStatus() == OrderStatus.FOR_DELIVERY) {
+      order.setStatus(OrderStatus.CANCELLED);
+
+      BigDecimal refundAmount = refundService.calculateRefund(request.getReason(), order);
+      refundService.createAndSaveRefundRequest(order.getId(), order.getRecipientName(), refundAmount);
+
+      orderRepository.saveOrder(order);
+    }
   }
 }
