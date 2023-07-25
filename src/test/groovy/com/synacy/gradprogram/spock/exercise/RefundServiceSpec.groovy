@@ -5,14 +5,11 @@ import spock.lang.Specification
 class RefundServiceSpec extends Specification {
 
     RefundService service
-    CancelOrderRequest cancelOrderRequest
-    RefundRepository refundRepository
-    Order order = Mock(order)
+    RefundRepository refundRepository = Mock(refundRepository)
 
 
     void setup() {
-        service = new RefundService()
-        Order order = Mock(order)
+        service = new RefundService(refundRepository)
 
     }
 
@@ -22,7 +19,6 @@ class RefundServiceSpec extends Specification {
         CancelReason cancelReason = CancelReason.DAMAGED
         Order order = new Order(totalCost: 200, dateOrdered: new Date())
 
-        RefundRequestStatus refundRequestStatus = Mock(RefundRequestStatus)
 
         when:
         BigDecimal totalCost = service.calculateRefund(cancelReason, order)
