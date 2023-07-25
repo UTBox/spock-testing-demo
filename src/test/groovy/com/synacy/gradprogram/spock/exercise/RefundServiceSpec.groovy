@@ -10,7 +10,7 @@ class RefundServiceSpec extends Specification {
     Order order = Mock(order)
 
 
-    def setup() {
+    void setup() {
         service = new RefundService()
         Order order = Mock(order)
 
@@ -25,30 +25,30 @@ class RefundServiceSpec extends Specification {
         RefundRequestStatus refundRequestStatus = Mock(RefundRequestStatus)
 
         when:
-        service.calculateRefund(cancelOrderRequest, order)
+        BigDecimal totalCost = service.calculateRefund(cancelReason, order)
 
         then:
-        refundRepository.saveRefundRequest(refund)
+        totalCost == BigDecimal.valueOf(200)
     }
 
 
-    def "calculateRefund Should full refund if the order was cancelled within 3 days of order date"() {
+    def "calculateRefund Should full refund if the order was cancelled within 3 days"() {
         given:
-        CancelOrderRequest cancelOrderRequest = new CancelOrderRequest(UUID.randomUUID())
-        Order order = new Order(totalCost: 200, dateOrdered: new Date())
-
-
-        RefundRequestStatus refundRequestStatus = Mock(RefundRequestStatus)
+        CancelReason cancelReason = CancelReason.DAMAGED
+        Order order = new Order(totalCost: 200, dateOrdered: DateUtils.subtractDays(new Date(), 3))
+        boolean isWithinThreeDays = DateUtils.isMoreThanThreeDays(order, dateOrdered)
 
         when:
-        service.calculateRefund(cancelOrderRequest, order)
+        BigDecimal totalCost = service.calculateRefund(cancelReason, order)
 
         then:
-        refundRepository.saveRefundRequest(refund)
+        isWithinThreeDays
+        totalCost == BigDecimal.valueOf(200)
+
     }
 
 
-    def  "CreateAndSaveRefundRequest Should be save the refund request with the correct details"() {
+    def "CreateAndSaveRefundRequest Should be save the refund request with the correct details"() {
         given:
         UUID orderId = UUID.randomUUID()
         String recipientName = "Precious"
@@ -66,7 +66,8 @@ class RefundServiceSpec extends Specification {
             assert refundRequestStatus == refundRequest.getStatus()
 
 
+        }
+
+
     }
-
-
 }
