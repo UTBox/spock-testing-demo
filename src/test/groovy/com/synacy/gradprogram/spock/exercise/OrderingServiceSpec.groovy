@@ -12,7 +12,7 @@ class OrderingServiceSpec extends Specification {
         orderingService = new OrderingService(orderRepository, refundService)
     }
 
-    def "cancelOrder should cancel PENDING and FOR_DELIVERY order and create refund amount and refund request"() {
+    def "cancelOrder should cancel PENDING and FOR_DELIVERY order then create refund amount and refund request"() {
         given:
         Order order = new Order(totalCost: 100.0d, recipientName: "Romeo", status: status)
         CancelOrderRequest cancelOrderRequest = new CancelOrderRequest()

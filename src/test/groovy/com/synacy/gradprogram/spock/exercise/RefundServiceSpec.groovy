@@ -2,6 +2,8 @@ package com.synacy.gradprogram.spock.exercise
 
 import spock.lang.Specification
 
+import java.time.LocalDate
+
 class RefundServiceSpec extends Specification {
 
     RefundService service
