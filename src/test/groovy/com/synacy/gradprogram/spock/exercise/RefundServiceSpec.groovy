@@ -40,12 +40,33 @@ class RefundServiceSpec extends Specification {
 
         RefundRequestStatus refundRequestStatus = Mock(RefundRequestStatus)
 
-
         when:
         service.calculateRefund(cancelOrderRequest, order)
 
         then:
         refundRepository.saveRefundRequest(refund)
     }
-}
 
+
+    def  "CreateAndSaveRefundRequest Should be save the refund request with the correct details"() {
+        given:
+        UUID orderId = UUID.randomUUID()
+        String recipientName = "Precious"
+        BigDecimal refundAmount = BigDecimal.valueOf(200)
+        RefundRequestStatus refundRequestStatus = RefundRequestStatus.TO_PROCESS
+
+        when:
+        service.createAndSaveRefundRequest(orderId, recipientName, refundAmount)
+
+        then:
+        1 * refundRepository.saveRefundRequest(_) >> { RefundRequest refundRequest ->
+            assert orderId == refundRequest.getOrderId()
+            assert recipientName == refundRequest.getRecipientName()
+            assert refundAmount == refundRequest.getRefundAmount()
+            assert refundRequestStatus == refundRequest.getStatus()
+
+
+    }
+
+
+}
