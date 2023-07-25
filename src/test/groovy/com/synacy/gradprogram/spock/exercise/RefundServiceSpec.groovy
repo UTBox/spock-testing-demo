@@ -48,7 +48,7 @@ class RefundServiceSpec extends Specification {
         result == BigDecimal.valueOf(50.0)
     }
 
-    def "createAndSaveRefundRequest should create refund request"() {
+    def "createAndSaveRefundRequest should create refund request with the correct values"() {
         given:
         UUID orderId = UUID.randomUUID()
         String recipientName = "Romeo"
