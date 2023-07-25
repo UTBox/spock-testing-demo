@@ -16,7 +16,8 @@ class ShoppingServiceSpec extends Specification {
 
 
     def setup() {
-        service = new ShoppingService()
+        service = new ShoppingService(orderingService, deliveryService,
+                orderRepository, deliveryRequestRepository)
     }
 
     def "buyNonSpoilingItemsInCart should be able to create delivery order"(){
@@ -32,33 +33,46 @@ class ShoppingServiceSpec extends Specification {
 
         Cart itemsInTheCart = new Cart(UUID.randomUUID(), items)
 
-        User user = new User()
+        User user = Mock(User)
+        user.getFirstName() >> "Clark"
+        user.getLastName() >> "Tabar"
+        user.getAddress() >> "Cebu"
 
-        user.setFirstName("Clark")
-        user.setLastName("Tabar")
-        String address = "Cebu"
+        String recipientName = user.getFirstName().concat(" ").concat(user.getLastName())
 
-
-
-        //boolean containsFoodItems =  orderingService.cartContainsFoodItem(false)
-
-        String recipient = user.getFirstName().concat(" ").concat(user.getLastName())
-        Order createOrder = orderingService.createAnOrder (itemsInTheCart, recipient, address, false)
-
-
+        Order order = orderingService.createAnOrder(itemsInTheCart, recipientName, user.getAddress(), false)
 
         when:
         service.buyNonSpoilingItemsInCart(itemsInTheCart, user)
 
         then:
-        1 * deliveryService.createDelivery(_){ DeliveryRequestRepository deliveryRequestRepository ->
-            assert createOrder == orderingService.createAnOrder()
-            assert recipient == createOrder.getRecipientName()
-
-        }
+        1 * deliveryService.createDelivery(order)
 
     }
 
+    def "getOrderSummary should get the summary of the order."(){
+        given:
+        UUID orderId = UUID.randomUUID()
+
+        Order order = Mock(Order)
+        order.getId() >> orderRepository.fetchOrderById(orderId)
+        order.getTotalCost() >> 500.0
+        order.getStatus() >> OrderStatus.PENDING
+
+        DeliveryRequest deliveryRequest = Mock(DeliveryRequest)
+        deliveryRequest.getOrderId() >> deliveryRequestRepository.fetchDeliveryRequestByOrderId(orderId)
+        DateUtils dateNow = Mock (DateUtils)
+        deliveryRequest.getDeliveryDate() >>  new Date()
+        deliveryRequest.getCourier() >> Courier.LBC
+
+
+
+        when:
+        service.getOrderSummary(orderId)
+
+        then:
+        deliveryRequest.getCourier() == OrderSummary(deliveryRequest.getCourier())
+    }
 
 
 
