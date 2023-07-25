@@ -2,6 +2,8 @@ package com.synacy.gradprogram.spock.exercise
 
 import spock.lang.Specification
 
+import java.time.LocalDateTime
+
 class RefundServiceSpec extends Specification {
 
     RefundService service
@@ -21,37 +23,44 @@ class RefundServiceSpec extends Specification {
 
 
         when:
-        BigDecimal totalCost = service.calculateRefund(cancelReason, order)
+        BigDecimal refundAmount = service.calculateRefund(cancelReason, order)
 
         then:
-        totalCost == BigDecimal.valueOf(200)
+        refundAmount == BigDecimal.valueOf(200)
     }
 
 
-    def "calculateRefund Should full refund if the order was cancelled within 3 days"() {
+    def "calculateRefund Should give full refund if the order was cancelled within 3 days"() {
         given:
         CancelReason cancelReason = CancelReason.DAMAGED
-        Order order = new Order(totalCost: 200, dateOrdered: DateUtils.subtractDays(new Date(), 3))
-        boolean isWithinThreeDays = DateUtils.isMoreThanThreeDays(order, dateOrdered)
+        Order order = new Order()
+        order.setTotalCost(new BigDecimal(200))
+        LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3)
+        order.setDateOrdered(Date.from(threeDaysAgo.atZone(ZoneId.systemDefault()).toInstant()))
+        boolean isWithinThreeDays = LocalDateTime.ofInstant(order.getDateOrdered().toInstant(), ZoneId.systemDefault()).isAfter(LocalDateTime.now().minusDays(3))
 
         when:
-        BigDecimal totalCost = service.calculateRefund(cancelReason, order)
+        BigDecimal refundAmount = service.calculateRefund(cancelReason, order)
 
         then:
         isWithinThreeDays
-        totalCost == BigDecimal.valueOf(200)
+        refundAmount == BigDecimal.valueOf(200)
 
     }
 
     def "calculateRefund should calculate half refund more than 3 days after the order"() {
         given:
         CancelReason cancelReason = CancelReason.DAMAGED
-        Order order = new Order(totalCost: 200, dateOrdered: DateUtils.dateOrdered(new Date(), 4))
+        Order order = new Order()
+        order.setTotalCost(new BigDecimal(200))
+        LocalDateTime fourDaysAgo = LocalDateTime.now().minusDays(4)
+        order.setDateOrdered(Date.from(fourDaysAgo.atZone(ZoneId.systemDefault()).toInstant()))
 
         when:
-        BigDecimal totalCost = service.calculateRefund(cancelReason, order)
+        BigDecimal refundAmount = service.calculateRefund(cancelReason, order)
+
         then:
-        totalCost == BigDecimal.valueOf(100)
+        refundAmount == BigDecimal.valueOf(100)
     }
 
 
