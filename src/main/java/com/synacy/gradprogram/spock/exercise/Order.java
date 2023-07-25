@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class Order {
 
-  private final UUID id;
+  private UUID id;
   private double totalCost;
   private String recipientName;
   private String recipientAddress;

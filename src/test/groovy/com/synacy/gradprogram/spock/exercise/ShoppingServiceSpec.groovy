@@ -15,7 +15,7 @@ class ShoppingServiceSpec extends Specification {
     DeliveryRequestRepository deliveryRequestRepository = Mock(DeliveryRequestRepository)
 
     void setup() {
-        shoppingService = new ShoppingService(orderingService, deliveryService, orderRepository, deliveryRequestRepository)
+        shoppingService = new ShoppingService(orderingService, deliveryService, orderRepository, deliveryRequestRepository,)
     }
 
     def "BuyNonSpoilingItemsInCart should create an Order Delivery"() {
@@ -35,12 +35,26 @@ class ShoppingServiceSpec extends Specification {
         1 * deliveryService.createDelivery(_ as Order)
     }
 
-   /* def "Should return a Order Summary"(){
-        given:
-        Order order = Mock(Order)
-        UUID orderId = UUID.randomUUID()
+ def "OrderSummary Should return a Order Summary"(){
+     given:
+     UUID orderId = UUID.randomUUID()
+     DateUtils dateUtils = Mock(DateUtils)
+     Order order = new Order(id: orderId, totalCost: 100.00, status: OrderStatus.PENDING)
+     DeliveryRequest deliveryRequest = new DeliveryRequest(orderId: orderId, deliveryDate: new Date(), courier: Courier.LBC)
+     dateUtils.getCurrentDate() >> new Date()
 
-        when:
-        deliveryRequestRepository.fetchDeliveryRequestByOrderId(orderId: orderId)
-    }*/
+
+     1 * orderRepository.fetchOrderById(orderId) >> order
+     1 * deliveryRequestRepository.fetchDeliveryRequestByOrderId(orderId) >> deliveryRequest
+
+     when:
+     OrderSummary result = shoppingService.getOrderSummary(orderId)
+
+     then:
+     result.totalCost == 100.00
+     result.status == OrderStatus.PENDING
+     result.courier == Courier.LBC
+
+    }
+
 }
