@@ -23,25 +23,24 @@ class OrderingServiceSpec extends Specification {
         given:
         List<Item> testListItemWFood = [food, gadget, appliance, clothing]
         def testCart = new Cart(UUID.randomUUID(), testListItemWFood)
-        boolean isContainFood = true
 
         when:
-        boolean foodItem = orderingService.cartContainsFoodItem(testCart)
+        boolean containsFoodItem = orderingService.cartContainsFoodItem(testCart)
 
         then:
-        isContainFood == foodItem
+        containsFoodItem
     }
 
     def "cartContainsFoodItem should respond with false if cart does not contains item with type food"() {
         given:
         List<Item> testListItemWoFood = [gadget, appliance, clothing]
         def testCart = new Cart(UUID.randomUUID(), testListItemWoFood)
-        boolean isNotContainFood = false
+
         when:
-        boolean foodItem = orderingService.cartContainsFoodItem(testCart)
+        boolean containsFoodItem = orderingService.cartContainsFoodItem(testCart)
 
         then:
-        isNotContainFood == foodItem
+        !containsFoodItem
     }
 
     def "calculateTotalCostOfCart should respond with the total cost of item inside the cart"() {
@@ -61,13 +60,12 @@ class OrderingServiceSpec extends Specification {
         given:
         List<Item> testListItem = [food, gadget, appliance, clothing, food2, gadget2]
         def testCart = new Cart(UUID.randomUUID(), testListItem)
-        boolean isExpectedEligible = true
 
         when:
         boolean isEligible = orderingService.isCartEligibleForDiscount(testCart)
 
         then:
-        isExpectedEligible == isEligible
+        isEligible
     }
 
     def "isCartEligibleForDiscount should respond with false if cart price is less than 50.0 and cart size is less than 5"() {
@@ -75,13 +73,12 @@ class OrderingServiceSpec extends Specification {
         given:
         List<Item> testListItem = [food, gadget, clothing]
         def testCart = new Cart(UUID.randomUUID(), testListItem)
-        boolean isNotEligible = false
 
         when:
         boolean isEligible = orderingService.isCartEligibleForDiscount(testCart)
 
         then:
-        isNotEligible == isEligible
+        !isEligible
     }
 
     def "isCartEligibleForDiscount should respond with false if cart price is greater than 50.0 but cart size is less than 5"() {
@@ -89,13 +86,12 @@ class OrderingServiceSpec extends Specification {
         given:
         List<Item> testListItem = [food, gadget, appliance, clothing]
         def testCart = new Cart(UUID.randomUUID(), testListItem)
-        boolean isNotEligible = false
 
         when:
         boolean isEligible = orderingService.isCartEligibleForDiscount(testCart)
 
         then:
-        isNotEligible == isEligible
+        !isEligible
     }
 
     def "isCartEligibleForDiscount should respond with false if cart price is less than 50.0 but cart size is greater than 5"() {
@@ -103,13 +99,12 @@ class OrderingServiceSpec extends Specification {
         given:
         List<Item> testListItem = [food2, gadget2, clothing2, gadget, clothing, appliance2]
         def testCart = new Cart(UUID.randomUUID(), testListItem)
-        boolean isNotEligible = false
 
         when:
         boolean isEligible = orderingService.isCartEligibleForDiscount(testCart)
 
         then:
-        isNotEligible == isEligible
+        !isEligible
     }
 
     def "ApplyDiscountToCartItems should respond with discounted cost"() {
@@ -130,7 +125,7 @@ class OrderingServiceSpec extends Specification {
         0.5d == testListItem[5].getCost()
     }
 
-    def "ApplyDiscountToCartItems should not respond with discounted cost"() {
+    def "ApplyDiscountToCartItems should not apply discount to items"() {
         given:
         List<Item> testListItem = [food, gadget, appliance, clothing]
 
@@ -140,9 +135,6 @@ class OrderingServiceSpec extends Specification {
         orderingService.applyDiscountToCartItems(testCart)
 
         then:
-        /*0.upto(discountedCost.size() - 1) { index ->
-            discountedCost[index] == testCart.items[index].cost
-        }*/
         15d == testListItem[0].getCost()
         10d == testListItem[1].getCost()
         20d == testListItem[2].getCost()
