@@ -16,7 +16,7 @@ class RefundServiceSpec extends Specification {
 
     }
 
-    def "calculateRefund Should calculate the refund and give full refund due to cancel reason is damaged"() {
+    def "calculateRefund Should calculate the refund give full refund due to cancel reason is damaged"() {
 
         given:
         CancelReason cancelReason = CancelReason.DAMAGED
@@ -45,6 +45,17 @@ class RefundServiceSpec extends Specification {
         isWithinThreeDays
         totalCost == BigDecimal.valueOf(200)
 
+    }
+
+    def "calculateRefund should calculate half refund more than 3 days after the order"() {
+        given:
+        CancelReason cancelReason = CancelReason.DAMAGED
+        Order order = new Order(totalCost: 200, dateOrdered: DateUtils.dateOrdered(new Date(), 4))
+
+        when:
+        BigDecimal totalCost = service.calculateRefund(cancelReason, order)
+        then:
+        totalCost == BigDecimal.valueOf(100)
     }
 
 
