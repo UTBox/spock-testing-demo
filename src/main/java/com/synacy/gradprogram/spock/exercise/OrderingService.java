@@ -2,6 +2,7 @@ package com.synacy.gradprogram.spock.exercise;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Optional;
 
 public class OrderingService {
 
@@ -70,13 +71,14 @@ public class OrderingService {
   }
 
   public void cancelOrder(CancelOrderRequest request, Order order) {
-    if (order.getStatus() == OrderStatus.PENDING || order.getStatus() == OrderStatus.FOR_DELIVERY) {
-      order.setStatus(OrderStatus.CANCELLED);
+    Optional<Order> orderOptional = orderRepository.fetchOrderById(order.getId());
+    if (orderOptional.get().getStatus() == OrderStatus.PENDING || orderOptional.get().getStatus() == OrderStatus.FOR_DELIVERY) {
+      orderOptional.get().setStatus(OrderStatus.CANCELLED);
 
-      BigDecimal refundAmount = refundService.calculateRefund(request.getReason(), order);
-      refundService.createAndSaveRefundRequest(order.getId(), order.getRecipientName(), refundAmount);
+      BigDecimal refundAmount = refundService.calculateRefund(request.getReason(), orderOptional.get());
+      refundService.createAndSaveRefundRequest(orderOptional.get().getId(), orderOptional.get().getRecipientName(), refundAmount);
 
-      orderRepository.saveOrder(order);
+      orderRepository.saveOrder(orderOptional.get());
     }
     else {
       throw new UnableToCancelException("Unable to cancel order");
