@@ -5,11 +5,9 @@ import java.util.UUID;
 
 public class Cart {
 
-
   private final UUID id;
 
   private List<Item> items;
-
   private int totalItems;
 
   public Cart(UUID id, List<Item> items) {
