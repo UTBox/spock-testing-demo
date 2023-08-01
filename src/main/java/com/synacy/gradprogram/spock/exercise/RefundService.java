@@ -15,8 +15,8 @@ public class RefundService {
 
   public BigDecimal calculateRefund(CancelReason cancelReason, Order order) {
     double refundAmount =  order.getTotalCost();
-    boolean isMoreThanThreeDaysAgo = DateUtils.isMoreThanThreeDaysAgo(order.getDateOrdered());
-    if (cancelReason == CancelReason.DAMAGED || isMoreThanThreeDaysAgo) {
+    boolean isWithinThreeDays = DateUtils.isMoreThanThreeDaysAgo(order.getDateOrdered());
+    if (cancelReason == CancelReason.DAMAGED || isWithinThreeDays) {
 
       return BigDecimal.valueOf(refundAmount);
     } else if (cancelReason == CancelReason.WRONG_ITEM) {
