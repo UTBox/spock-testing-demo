@@ -1,5 +1,6 @@
 package com.synacy.gradprogram.spock.exercise;
 
+// TODO: Add unit tests to this service's public methods
 public class OrderingService {
 
   public boolean cartContainsFoodItem(Cart cart) {
