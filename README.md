@@ -4,6 +4,7 @@
 - Make sure to branch out from “synacy-grad-program-2024-exercise-1” branch
 - Your branch name should be: “synacy-grad-program-2024-exercise-name” (e.g. synacy-grad-program-2024-exercise-steven)
 - Write unit tests for the public methods in the `com.synacy.gradprogram.spock.exercise.OrderingService` class using the Spock test framework with Groovy
+  - To run the tests, you can use this command: `./gradlew test`
 - Included in this project is a sample Spock test class `com.mechanitis.demo.spock.ExampleSpecification` that you can use as a reference. Or you can refer to the "Spock Testing Tutorial" below to learn more.
 - Once you are done adding the unit tests, create a pull request to merge your branch to the “synacy-grad-program-2024-exercise-1” branch
 
