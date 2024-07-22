@@ -2,6 +2,7 @@ package com.synacy.gradprogram.spock.exercise;
 
 import java.util.UUID;
 
+// Note: This is a dummy implementation and for the exercise purpose only
 public class OrderRepository {
 
   public void saveOrder(Order order) {

@@ -1,4 +1,4 @@
-package com.synacy.gradprogram.spock.demo;
+package com.synacy.gradprogram.spock.exercise;
 
 public enum CivilStatus {
   SINGLE,
