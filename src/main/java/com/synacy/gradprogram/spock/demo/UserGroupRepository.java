@@ -1,5 +1,6 @@
 package com.synacy.gradprogram.spock.demo;
 
+// NOTE: This is a mock class used for demonstration purposes only
 public class UserGroupRepository {
 
   public void saveUserGroup(UserGroup userGroup) {

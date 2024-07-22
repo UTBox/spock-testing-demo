@@ -44,15 +44,7 @@ public class UserService {
     }
   }
 
-  public void removeUserFromGroup(User user, UserGroup userGroup) {
-    if (user.getUserGroup() != userGroup) {
-      throw new UserDoesNotBelongToGroupException("Something");
-    }
-
-    userGroupService.userRemovedToGroup(userGroup);
-
-    user.setUserGroup(null);
-    userRepository.saveUser(user);
-  }
-
+  // TODO: Add removeUserFromGroup method with the parameters User and UserGroup.
+  //  The method should throw an Exception if the passed user does not belong to the passed group.
+  //  The method should disassociate the User from the UserGroup.
 }

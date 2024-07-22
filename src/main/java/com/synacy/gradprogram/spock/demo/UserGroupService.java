@@ -1,7 +1,5 @@
 package com.synacy.gradprogram.spock.demo;
 
-import java.util.Date;
-
 public class UserGroupService {
 
   private final UserGroupRepository userGroupRepository;
@@ -12,17 +10,8 @@ public class UserGroupService {
     this.dateService = dateService;
   }
 
-  public UserGroup createUserGroup(Long id,String userGroupName,int totalUserInGroup,Date date) {
-    UserGroup userGroup = new UserGroup();
-    userGroup.setId(id);
-    userGroup.setUserGroupName(userGroupName);
-    userGroup.setTotalUsersInGroup(totalUserInGroup);
-    userGroup.setLastUserAddedDate(date);
-
-    userGroupRepository.saveUserGroup(userGroup);
-
-    return userGroup;
-  }
+  // TODO: Add method with the parameters id, userGroupName, totalUserInGroup, and date.
+  //  Method should save the created UserGroup to the database. Then return the created UserGroup.
 
   public void userAddedToGroup(UserGroup userGroup) {
     int newUserTotal = userGroup.getTotalUsersInGroup() + 1;
@@ -32,14 +21,6 @@ public class UserGroupService {
     userGroupRepository.updateUserGroup(userGroup);
   }
 
-  public void userRemovedToGroup(UserGroup userGroup) {
-    if(userGroup.getTotalUsersInGroup()==0){
-      throw new EmptyUserGroupException();
-    }
-
-    int newUserTotal = userGroup.getTotalUsersInGroup() - 1;
-    userGroup.setTotalUsersInGroup(newUserTotal);
-
-    userGroupRepository.updateUserGroup(userGroup);
-  }
+  // TODO: Add method with the parameter UserGroup. The method should remove 1 to the UserGroup's total users.
+  //  The method should throw an Exception if the UserGroup has no users (0 total users).
 }
