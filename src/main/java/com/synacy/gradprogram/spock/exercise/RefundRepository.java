@@ -1,5 +1,6 @@
 package com.synacy.gradprogram.spock.exercise;
 
+// Note: This is a dummy implementation and for the exercise purpose only
 public class RefundRepository {
 
   public void saveRefundRequest(RefundRequest request) {
