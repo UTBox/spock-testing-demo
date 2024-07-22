@@ -1,12 +1,12 @@
 # Synacy Graduate Program Exercise 1
 
 ### Instructions:
-- Make sure to branch out from “synacy-grad-program-2024-exercise-2” branch
-- Your branch name should be: “synacy-grad-program-2024-exercise-2-name” (e.g. synacy-grad-program-2024-exercise-2-steven)
-- Write/Update unit tests for the methods in the services under the `com.synacy.gradprogram.spock.exercise` package using the Spock test framework with Groovy
-    - To run the tests, you can use this command: `./gradlew test`
-- You can use the same resources to help you with the exercise.
-- Once you are done adding the unit tests, create a pull request to merge your branch to the “synacy-grad-program-2024-exercise-2” branch (NOTE: PLEASE DO NOT MERGE THE PR)
+- Make sure to branch out from “synacy-grad-program-2024-exercise-tdd” branch
+- Your branch name should be: “synacy-grad-program-2024-exercise-tdd-name” (e.g. synacy-grad-program-2024-exercise-tdd-steven)
+- Implement methods using TDD in the services under the `com.synacy.gradprogram.spock.exercise` package with the "TODO comments"
+  - Commit each step in the TDD process separately
+  - To run the tests, you can use this command: `./gradlew test`
+- Once you are done adding the unit tests, create a pull request to merge your branch to the “synacy-grad-program-2024-exercise-tdd” branch (NOTE: PLEASE DO NOT MERGE THE PR)
 
 
 # Spock Testing Tutorial [![JetBrains team project](http://jb.gg/badges/team.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
