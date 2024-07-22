@@ -2,6 +2,7 @@ package com.synacy.gradprogram.spock.exercise;
 
 import java.util.UUID;
 
+// TODO: Add unit tests in this service's methods
 public class ShoppingService {
 
   private final OrderingService orderingService;

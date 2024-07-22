@@ -1,5 +1,6 @@
 package com.synacy.gradprogram.spock.exercise;
 
+// TODO: Update unit tests if needed in this service's methods
 public class OrderingService {
 
   private final OrderRepository orderRepository;
