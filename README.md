@@ -1,4 +1,4 @@
-# Synacy Graduate Program Exercise 1
+# Synacy Graduate Program Exercise 2
 
 ### Instructions:
 - Make sure to branch out from “synacy-grad-program-2024-exercise-2” branch
