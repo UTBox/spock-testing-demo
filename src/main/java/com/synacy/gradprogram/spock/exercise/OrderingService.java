@@ -36,7 +36,7 @@ public class OrderingService {
     double discountRate = 0.10;
     if (isCartEligibleForDiscount(cart)) {
       for (Item item : cart.getItems()) {
-        double discountedCost = item.getCost() * discountRate;
+        double discountedCost = item.getCost() - (item.getCost() * discountRate);
         item.setCost(discountedCost);
       }
     }
