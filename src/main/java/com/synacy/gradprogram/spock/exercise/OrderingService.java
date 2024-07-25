@@ -1,6 +1,5 @@
 package com.synacy.gradprogram.spock.exercise;
 
-// TODO: Add unit tests to this service's public methods
 public class OrderingService {
 
   public boolean cartContainsFoodItem(Cart cart) {
@@ -36,7 +35,7 @@ public class OrderingService {
     double discountRate = 0.10;
     if (isCartEligibleForDiscount(cart)) {
       for (Item item : cart.getItems()) {
-        double discountedCost = item.getCost() * discountRate;
+        double discountedCost = item.getCost() - (item.getCost() * discountRate);
         item.setCost(discountedCost);
       }
     }
