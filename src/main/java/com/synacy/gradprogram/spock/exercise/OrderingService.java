@@ -29,14 +29,14 @@ public class OrderingService {
     int itemCountDiscountThreshold = 5;
 
     return totalPrice > discountTotalAmountThreshold
-        && cart.getItems().size() > itemCountDiscountThreshold;
+            && cart.getItems().size() > itemCountDiscountThreshold;
   }
 
   public void applyDiscountToCartItems(Cart cart) {
     double discountRate = 0.10;
     if (isCartEligibleForDiscount(cart)) {
       for (Item item : cart.getItems()) {
-        double discountedCost = item.getCost() * discountRate;
+        double discountedCost = item.getCost() * (1 - discountRate);
         item.setCost(discountedCost);
       }
     }
