@@ -9,15 +9,7 @@ class OrderingServiceSpec extends Specification {
         orderingService = new OrderingService()
     }
 
-    def "cartContainsFoodItem should return true when cart contains #description"() {
-        given:
-        Cart foodCart = createFoodCartWith2Items(1)
-        Cart gadgetCart = createGadgetCartWith2Items(1)
-
-        Cart mixedCart = new Cart(UUID.randomUUID(), new ArrayList<Item>())
-        mixedCart.addItem(createFoodItem(1))
-        mixedCart.addItem(createGadgetItem(1))
-
+    def "cartContainsFoodItem should return #expectedHasFood when cart contains #description"() {
         when:
         boolean actualHasFood = orderingService.cartContainsFoodItem(cart)
 
@@ -28,7 +20,7 @@ class OrderingServiceSpec extends Specification {
         cart                            | expectedHasFood   | description
         createGadgetCartWith2Items(1)   | false             | "non-food items"
         createFoodCartWith2Items(1)     | true              | "food items"
-        createMixedCartWith2Items(1)    | true              | "mixed type items"
+        createMixedCartWith2Items(1)    | true              | "at least one food item"
     }
 
     def "isCartEligibleForDiscount should return #expectedEligibility when the total cost of cart #costDesc and # of items #itemsDesc"() {
@@ -40,7 +32,7 @@ class OrderingServiceSpec extends Specification {
 
         where:
         cart                                | expectedEligibility   | costDesc | itemsDesc
-        createFoodCartWith2Items(1)         | false                 | "<= 50"  |"< 6"
+        createFoodCartWith2Items(1)         | false                 | "<= 50"  | "< 6"
         createFoodCartWith2Items(26)        | false                 | "> 50"   | "< 6"
         createFoodCartWith6Items(1)         | false                 | "<= 50"  | "> 5"
         createFoodCartWith6Items(50)        | true                  | "> 50"   | "> 5"
@@ -57,34 +49,33 @@ class OrderingServiceSpec extends Specification {
         expectedTotal == actualTotal
 
         where:
-        cost | expectedTotal
-        1     | 2
-        50    | 100
+        cost   | expectedTotal
+        1d     | 2d
+        50d    | 100d
     }
 
-    def "applyDiscountToCartItems should #behaviorDesc to items if cart is #eligibilityDesc"() {
+    def "applyDiscountToCartItems should #behaviorDesc when the total cost of cart #costDesc and # of items #itemsDesc\""() {
         when:
         orderingService.applyDiscountToCartItems(cart)
 
         then:
-        println(cart.getItems()[0].getCost())
         expectedCost == cart.getItems()[0].getCost()
         expectedCost == cart.getItems()[1].getCost()
 
         where:
-        cart                                | expectedCost  | behaviorDesc  | eligibilityDesc
-        createFoodCartWith2Items(1)         | 1             | "not apply discount" | "not eligible"
-        createFoodCartWith2Items(26)        | 26            | "not apply discount" | "not eligible"
-        createFoodCartWith6Items(1)         | 1             | "not apply discount" | "not eligible"
-        createFoodCartWith6Items(50)        | 45            | "apply discount"     | "eligible"
+        cart                                | expectedCost   | behaviorDesc         | costDesc | itemsDesc
+        createFoodCartWith2Items(1)         | 1d             | "not apply discount" | "<= 50"  | "< 6"
+        createFoodCartWith2Items(26)        | 26d            | "not apply discount" | "> 50"   | "< 6"
+        createFoodCartWith6Items(1)         | 1d             | "not apply discount" | "<= 50"  | "> 5"
+        createFoodCartWith6Items(50)        | 45d            | "apply discount"     | "> 50"   | "> 5"
     }
 
     def "createAnOrder should return an order if order #desc"() {
         given:
-        def recipientName = "Juan"
-        def recipientAddress = "Lahug"
-        def totalCost = 2
-        def status = OrderStatus.PENDING
+        String recipientName = "Juan"
+        String recipientAddress = "Lahug"
+        double totalCost = 2
+        OrderStatus status = OrderStatus.PENDING
 
         when:
         Order order = orderingService.createAnOrder(cart, recipientName, recipientAddress, canContainFood)
@@ -106,81 +97,49 @@ class OrderingServiceSpec extends Specification {
     def "createAnOrder should throw an UnableToCreateOrderException if order cannot contain food but has a food item"(){
         given:
         Cart cartWithFood = createFoodCartWith2Items(1)
-        def recipientName = "Juan"
-        def recipientAddress = "Lahug"
-        def totalCost = 2
-        def status = OrderStatus.PENDING
+        String recipientName = "Juan"
+        String recipientAddress = "Lahug"
 
         when:
-        Order order = orderingService.createAnOrder(cartWithFood, recipientName, recipientAddress, false)
+        orderingService.createAnOrder(cartWithFood, recipientName, recipientAddress, false)
 
         then:
         thrown(UnableToCreateOrderException)
     }
 
-    def Item createFoodItem(cost){
-        return new Item("Cabbage", cost, ItemType.FOOD )
-    }
-
-    def Item createGadgetItem(cost){
-        return new Item("Mouse", cost, ItemType.GADGET)
-    }
-
-    def Cart createFoodCartWith2Items(cost){
+    Cart createFoodCartWith2Items(double cost){
         UUID uuid = UUID.randomUUID()
-        Cart cart = new Cart(uuid, new ArrayList<Item>())
-
-        cart.addItem(createFoodItem(cost))
-        cart.addItem(createFoodItem(cost))
-
-        return cart
+        return new Cart(uuid, [
+            new Item("Cabbage", cost, ItemType.FOOD ),
+            new Item("Cabbage", cost, ItemType.FOOD )
+        ])
     }
 
-    def Cart createFoodCartWith6Items(cost){
+    Cart createFoodCartWith6Items(double cost){
         UUID uuid = UUID.randomUUID()
-        Cart cart = new Cart(uuid, new ArrayList<Item>())
-
-        cart.addItem(createFoodItem(cost))
-        cart.addItem(createFoodItem(cost))
-        cart.addItem(createFoodItem(cost))
-        cart.addItem(createFoodItem(cost))
-        cart.addItem(createFoodItem(cost))
-        cart.addItem(createFoodItem(cost))
-
-        return cart
+        return new Cart(uuid, [
+            new Item("Cabbage", cost, ItemType.FOOD ),
+            new Item("Cabbage", cost, ItemType.FOOD ),
+            new Item("Cabbage", cost, ItemType.FOOD ),
+            new Item("Cabbage", cost, ItemType.FOOD ),
+            new Item("Cabbage", cost, ItemType.FOOD ),
+            new Item("Cabbage", cost, ItemType.FOOD )
+        ])
     }
 
-    def Cart createGadgetCartWith2Items(cost){
+    Cart createGadgetCartWith2Items(double cost){
         UUID uuid = UUID.randomUUID()
-        Cart cart = new Cart(uuid, new ArrayList<Item>())
-
-        cart.addItem(createGadgetItem(cost))
-        cart.addItem(createGadgetItem(cost))
-
-        return cart
+        return new Cart(uuid, [
+            new Item("Mouse", cost, ItemType.GADGET),
+            new Item("Mouse", cost, ItemType.GADGET)
+        ])
     }
 
-    def Cart createGadgetCartWith6Items(cost){
+    Cart createMixedCartWith2Items(double cost){
         UUID uuid = UUID.randomUUID()
-        Cart cart = new Cart(uuid, new ArrayList<Item>())
-
-        cart.addItem(createGadgetItem(cost))
-        cart.addItem(createGadgetItem(cost))
-        cart.addItem(createGadgetItem(cost))
-        cart.addItem(createGadgetItem(cost))
-        cart.addItem(createGadgetItem(cost))
-        cart.addItem(createGadgetItem(cost))
-
-        return cart
-    }
-
-    def Cart createMixedCartWith2Items(cost){
-        UUID uuid = UUID.randomUUID()
-        Cart cart = new Cart(uuid, new ArrayList<Item>())
-
-        cart.addItem(createFoodItem(cost))
-        cart.addItem(createGadgetItem(cost))
-
-        return cart
+        return new Cart(uuid, [
+            new Item("Cabbage", cost, ItemType.FOOD ),
+            new Item("Mouse", cost, ItemType.GADGET)
+        ])
     }
 }
