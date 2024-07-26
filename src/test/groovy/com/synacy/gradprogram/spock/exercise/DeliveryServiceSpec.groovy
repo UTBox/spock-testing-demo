@@ -12,9 +12,14 @@ class DeliveryServiceSpec extends Specification {
         deliveryService = new DeliveryService(dateUtils, deliveryRequestRepository)
     }
 
-    def "createDelivery should save and return a delivery request based on the order ID and date"() {
+    def "createDelivery should save a delivery request based on the order ID and date and assign #courier when the total cost is #costDesc"() {
         given:
-        Order order = new Order(totalCost: 1)
+        UUID id = UUID.randomUUID()
+
+        Order order = Mock()
+        order.getId() >> id
+        order.getTotalCost() >> totalCost
+
         Date deliveryDate = new Date()
         dateUtils.getCurrentDate() >> deliveryDate
 
@@ -23,22 +28,8 @@ class DeliveryServiceSpec extends Specification {
 
         then:
         1 * deliveryRequestRepository.saveDeliveryRequest(_ as DeliveryRequest) >> {DeliveryRequest deliveryRequest ->
-            assert order.id == deliveryRequest.orderId
+            assert id == deliveryRequest.orderId
             assert deliveryDate == deliveryRequest.deliveryDate
-        }
-    }
-
-    def "createDelivery should assign #courier since the total cost is #costDesc"() {
-        given:
-        Order order = new Order(totalCost: totalCost)
-        Date deliveryDate = new Date()
-        dateUtils.getCurrentDate() >> deliveryDate
-
-        when:
-        deliveryService.createDelivery(order)
-
-        then:
-        1 * deliveryRequestRepository.saveDeliveryRequest(_ as DeliveryRequest) >> {DeliveryRequest deliveryRequest ->
             assert courier == deliveryRequest.courier
         }
 
