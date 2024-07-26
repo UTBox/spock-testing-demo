@@ -11,21 +11,21 @@ class RefundServiceSpec extends Specification {
         refundService = new RefundService(refundRepository)
     }
 
-    def "createAndSaveRefundRequest should create a refund request using the recipient name and order ID"(){
+    def "createAndSaveRefundRequest should create and save a refund request using the recipient name and order ID"(){
         given:
         String recipientName = "John Cena"
         UUID uuid = UUID.randomUUID()
-        BigDecimal refundAmount = 100
+        BigDecimal refundAmount = null
 
         when:
         refundService.createAndSaveRefundRequest(recipientName, uuid)
 
         then:
-        1 * refundService.createRefundRequest(recipientName, uuid) >> { RefundRequest refundRequest ->
-            assert recipientName == refundRequest.getRecipientName()
-            assert uuid == refundRequest.getOrderId()
-            assert refundAmount == refundRequest.getRefundAmount()
-            assert RefundRequestStatus.TO_PROCESS == refundRequest.getStatus()
+        1 * refundRepository.saveRefundRequest(_ as RefundRequest) >> {RefundRequest request ->
+            assert recipientName == request.getRecipientName()
+            assert uuid == request.getOrderId()
+            assert refundAmount == request.getRefundAmount()
+            assert RefundRequestStatus.TO_PROCESS == request.getStatus()
         }
     }
 }
