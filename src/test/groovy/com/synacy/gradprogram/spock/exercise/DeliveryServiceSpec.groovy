@@ -12,7 +12,7 @@ class DeliveryServiceSpec extends Specification {
         deliveryService = new DeliveryService(dateUtils, deliveryRequestRepository)
     }
 
-    def "CreateDelivery should save delivery request using the given details and determineCourier should return #expectedCourier based on #totalCost"() {
+    def "createDelivery should save delivery request using the given details and determineCourier should return #expectedCourier based on #totalCost"() {
         given:
         Order order = new Order()
         order.setTotalCost(totalCost)

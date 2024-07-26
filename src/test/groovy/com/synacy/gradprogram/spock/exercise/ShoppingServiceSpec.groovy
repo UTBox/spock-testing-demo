@@ -16,7 +16,7 @@ class ShoppingServiceSpec extends Specification {
         shoppingService = new ShoppingService(orderingService, deliveryService, orderRepository, deliveryRequestRepository)
     }
 
-    def "BuyNonSpoilingItemsInCart should call applyDiscountToCartItems, create an order, and create a delivery based on #expectedOrder"() {
+    def "buyNonSpoilingItemsInCart should call applyDiscountToCartItems, create an order, and create a delivery based on #expectedOrder"() {
         given:
         Order expectedOrder = new Order()
         Cart cart = new Cart(UUID.randomUUID(), [])
@@ -34,7 +34,7 @@ class ShoppingServiceSpec extends Specification {
         1 * deliveryService.createDelivery(expectedOrder)
     }
 
-    def "GetOrderSummary should return an OrderSummary object"() {
+    def "getOrderSummary should return an OrderSummary object"() {
         given:
         Order expectedOrder = new Order()
         UUID expectedOrderId = expectedOrder.getId()
