@@ -1,6 +1,7 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class RefundService {
 
@@ -10,7 +11,7 @@ public class RefundService {
     return null;
   }
 
-  private void createAndSaveRefundRequest() {
+  public void createAndSaveRefundRequest(String recipientName, UUID orderId) {
     // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
   }
 

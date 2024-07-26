@@ -6,9 +6,11 @@ import java.util.UUID;
 public class OrderingService {
 
   private final OrderRepository orderRepository;
+  private final RefundService refundService;
 
-  public OrderingService(OrderRepository orderRepository) {
+  public OrderingService(OrderRepository orderRepository, RefundService refundService) {
     this.orderRepository = orderRepository;
+    this.refundService = refundService;
   }
 
   public boolean cartContainsFoodItem(Cart cart) {
@@ -74,11 +76,15 @@ public class OrderingService {
     UUID orderId = request.getOrderId();
     Order order = orderRepository.fetchOrderById(orderId).get();
 
-    OrderStatus orderStatus = order.getStatus();
-    if(orderStatus != OrderStatus.PENDING && orderStatus != OrderStatus.FOR_DELIVERY){
+    if(!canCancelOrder(order)){
       throw new UnableToCancelException("Order status is not eligible for cancellation");
     }
 
     order.setStatus(OrderStatus.CANCELLED);
+    refundService.createAndSaveRefundRequest(order.getRecipientName(), orderId);
+  }
+
+  private boolean canCancelOrder(Order order){
+    return order.getStatus() == OrderStatus.PENDING || order.getStatus() == OrderStatus.FOR_DELIVERY;
   }
 }
