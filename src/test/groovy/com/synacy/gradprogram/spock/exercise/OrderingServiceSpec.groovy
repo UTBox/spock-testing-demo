@@ -7,9 +7,10 @@ class OrderingServiceSpec extends Specification {
     OrderingService orderingService
 
     OrderRepository orderRepository = Mock()
+    RefundService refundService = Mock()
 
     def setup(){
-        orderingService = new OrderingService(orderRepository)
+        orderingService = new OrderingService(orderRepository, refundService)
     }
 
     def "cancelOrder should throw an UnableToCancelException for orders with #status status"(){
@@ -57,8 +58,11 @@ class OrderingServiceSpec extends Specification {
 
     def "cancelOrder should create and save a refund request on cancelled #status orders"(){
         given:
+        String recipientName = "John Wick"
+
         Order order = new Order()
         order.setStatus(status)
+        order.setRecipientName(recipientName)
         UUID uuid = order.getId()
 
         and:
@@ -66,14 +70,11 @@ class OrderingServiceSpec extends Specification {
         request.getOrderId() >> uuid
         orderRepository.fetchOrderById(uuid) >> Optional.of(order)
 
-        and:
-        RefundService refundService = Mock()
-
         when:
         orderingService.cancelOrder(request)
 
         then:
-        1 * refundService.createAndSaveRefundRequest()
+        1 * refundService.createAndSaveRefundRequest(recipientName, uuid)
 
         where:
         status << [OrderStatus.PENDING, OrderStatus.FOR_DELIVERY]
