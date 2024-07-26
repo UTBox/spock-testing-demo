@@ -25,21 +25,6 @@ class OrderingServiceSpec extends Specification {
         createMixedCartWith2Items(1)    | true              | "at least one food item"
     }
 
-    def "isCartEligibleForDiscount should return #expectedEligibility when the total cost of cart #costDesc and # of items #itemsDesc"() {
-        when:
-        boolean actualEligibility = orderingService.isCartEligibleForDiscount(cart)
-
-        then:
-        expectedEligibility == actualEligibility
-
-        where:
-        cart                                | expectedEligibility   | costDesc | itemsDesc
-        createFoodCartWith2Items(1)         | false                 | "<= 50"  |"< 6"
-        createFoodCartWith2Items(26)        | false                 | "> 50"   | "< 6"
-        createFoodCartWith6Items(1)         | false                 | "<= 50"  | "> 5"
-        createFoodCartWith6Items(50)        | true                  | "> 50"   | "> 5"
-    }
-
     def "calculateTotalCostOfCart should return the total cost of the items in the cart"() {
         given:
         Cart cart = createMixedCartWith2Items(cost)
@@ -54,6 +39,21 @@ class OrderingServiceSpec extends Specification {
         cost  | expectedTotal
         1     | 2d
         50    | 100d
+    }
+
+    def "isCartEligibleForDiscount should return #expectedEligibility when the total cost of cart #costDesc and # of items #itemsDesc"() {
+        when:
+        boolean actualEligibility = orderingService.isCartEligibleForDiscount(cart)
+
+        then:
+        expectedEligibility == actualEligibility
+
+        where:
+        cart                                | expectedEligibility   | costDesc | itemsDesc
+        createFoodCartWith2Items(1)         | false                 | "<= 50"  |"< 6"
+        createFoodCartWith2Items(26)        | false                 | "> 50"   | "< 6"
+        createFoodCartWith6Items(1)         | false                 | "<= 50"  | "> 5"
+        createFoodCartWith6Items(50)        | true                  | "> 50"   | "> 5"
     }
 
     def "applyDiscountToCartItems should #behaviorDesc to items when the total cost of cart #costDesc and # of items #itemsDesc"() {
