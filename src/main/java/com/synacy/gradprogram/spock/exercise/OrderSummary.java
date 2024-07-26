@@ -6,6 +6,7 @@ public class OrderSummary {
 
   private final double totalCost;
   private final OrderStatus status;
+
   private final Date deliveryDate;
   private final Courier courier;
 
@@ -14,5 +15,21 @@ public class OrderSummary {
     this.status = status;
     this.deliveryDate = deliveryDate;
     this.courier = courier;
+  }
+
+  public double getTotalCost() {
+    return totalCost;
+  }
+
+  public OrderStatus getStatus() {
+    return status;
+  }
+
+  public Date getDeliveryDate() {
+    return deliveryDate;
+  }
+
+  public Courier getCourier() {
+    return courier;
   }
 }
