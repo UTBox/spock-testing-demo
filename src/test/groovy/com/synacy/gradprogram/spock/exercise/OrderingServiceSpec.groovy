@@ -55,5 +55,29 @@ class OrderingServiceSpec extends Specification {
         status << [OrderStatus.PENDING, OrderStatus.FOR_DELIVERY]
     }
 
+    def "cancelOrder should create and save a refund request on cancelled #status orders"(){
+        given:
+        Order order = new Order()
+        order.setStatus(status)
+        UUID uuid = order.getId()
+
+        and:
+        CancelOrderRequest request = Mock()
+        request.getOrderId() >> uuid
+        orderRepository.fetchOrderById(uuid) >> Optional.of(order)
+
+        and:
+        RefundService refundService = Mock()
+
+        when:
+        orderingService.cancelOrder(request)
+
+        then:
+        1 * refundService.createAndSaveRefundRequest()
+
+        where:
+        status << [OrderStatus.PENDING, OrderStatus.FOR_DELIVERY]
+    }
+
 
 }
