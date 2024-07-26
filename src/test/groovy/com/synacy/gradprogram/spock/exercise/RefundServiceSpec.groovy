@@ -5,8 +5,10 @@ import spock.lang.Specification
 class RefundServiceSpec extends Specification {
     RefundService refundService
 
+    RefundRepository refundRepository = Mock()
+
     def setup(){
-        refundService = new RefundService()
+        refundService = new RefundService(refundRepository)
     }
 
     def "createAndSaveRefundRequest should create a refund request using the recipient name and order ID"(){

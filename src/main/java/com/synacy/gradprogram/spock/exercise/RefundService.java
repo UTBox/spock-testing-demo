@@ -4,6 +4,11 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public class RefundService {
+  RefundRepository refundRepository;
+
+  public RefundService(RefundRepository refundRepository){
+    this.refundRepository = refundRepository;
+  }
 
   public BigDecimal calculateRefund() {
     // TODO: Implement me. Full refund if cancel reason is due to damaged item.
