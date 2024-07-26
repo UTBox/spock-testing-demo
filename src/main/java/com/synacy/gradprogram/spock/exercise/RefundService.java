@@ -17,7 +17,17 @@ public class RefundService {
   }
 
   public void createAndSaveRefundRequest(String recipientName, UUID orderId) {
-    // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
+    RefundRequest refundRequest = createRefundRequest(recipientName, orderId);
+    refundRepository.saveRefundRequest(refundRequest);
   }
 
+  private RefundRequest createRefundRequest(String recipientName, UUID orderId){
+    RefundRequest refundRequest = new RefundRequest();
+    refundRequest.setRecipientName(recipientName);
+    refundRequest.setOrderId(orderId);
+    refundRequest.setRefundAmount(this.calculateRefund());
+    refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
+
+    return refundRequest;
+  }
 }
