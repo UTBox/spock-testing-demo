@@ -78,7 +78,7 @@ public class OrderingService {
     }
 
     order.setStatus(OrderStatus.CANCELLED);
-    refundService.createAndSaveRefundRequest(order.getRecipientName(), orderId);
+    refundService.createAndSaveRefundRequest(order, request);
   }
 
   private boolean canCancelOrder(Order order){
