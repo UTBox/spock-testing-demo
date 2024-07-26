@@ -65,4 +65,8 @@ public class User {
   public void setUserGroup(UserGroup userGroup) {
     this.userGroup = userGroup;
   }
+
+  public String getFullName(){
+    return this.firstName.concat(" ").concat(this.lastName);
+  }
 }
