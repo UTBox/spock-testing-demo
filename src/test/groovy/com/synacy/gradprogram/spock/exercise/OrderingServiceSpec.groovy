@@ -74,7 +74,7 @@ class OrderingServiceSpec extends Specification {
         orderingService.cancelOrder(request)
 
         then:
-        1 * refundService.createAndSaveRefundRequest(recipientName, uuid)
+        1 * refundService.createAndSaveRefundRequest(order, request)
 
         where:
         status << [OrderStatus.PENDING, OrderStatus.FOR_DELIVERY]
