@@ -1,6 +1,8 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 
 public class OrderingService {
 
@@ -69,5 +71,14 @@ public class OrderingService {
   public void cancelOrder(CancelOrderRequest request) {
     // TODO: Implement me. Cancels PENDING and FOR_DELIVERY orders and create a refund request saving it to the database.
     //  Else throws an UnableToCancelException
+
+    UUID orderId = request.getOrderId();
+    Order order = orderRepository.fetchOrderById(orderId).get();
+
+    OrderStatus orderStatus = order.getStatus();
+
+    if(orderStatus != OrderStatus.PENDING && orderStatus != OrderStatus.FOR_DELIVERY){
+      throw new UnableToCancelException("Order status is not eligible for cancellation");
+    }
   }
 }
