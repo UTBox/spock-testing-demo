@@ -1,33 +1,49 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.UUID;
 
 public class RefundService {
   RefundRepository refundRepository;
+  DateUtils dateUtils;
 
-  public RefundService(RefundRepository refundRepository){
+  public RefundService(RefundRepository refundRepository, DateUtils dateUtils){
     this.refundRepository = refundRepository;
+    this.dateUtils = dateUtils;
   }
 
-  public BigDecimal calculateRefund() {
-    // TODO: Implement me. Full refund if cancel reason is due to damaged item.
-    //  Also full refund if the order was cancelled within 3 days of order date, else refund half of the total cost.
-    return null;
+  private BigDecimal calculateRefund(Order order, CancelOrderRequest cancelOrderRequest) {
+    int refundDateThreshold = 3;
+
+    if(cancelOrderRequest.getReason() == CancelReason.DAMAGED){
+      return BigDecimal.valueOf(order.getTotalCost());
+    }
+
+    if(isRefundFull(order.getDateOrdered(), cancelOrderRequest.getDateCancelled(), refundDateThreshold)){
+      return BigDecimal.valueOf(order.getTotalCost());
+    }
+
+    return BigDecimal.valueOf(order.getTotalCost() / 2);
   }
 
-  public void createAndSaveRefundRequest(String recipientName, UUID orderId) {
-    RefundRequest refundRequest = createRefundRequest(recipientName, orderId);
+  public void createAndSaveRefundRequest(Order order, CancelOrderRequest cancelOrderRequest) {
+    RefundRequest refundRequest = createRefundRequest(order, cancelOrderRequest);
     refundRepository.saveRefundRequest(refundRequest);
   }
 
-  private RefundRequest createRefundRequest(String recipientName, UUID orderId){
+  private RefundRequest createRefundRequest(Order order, CancelOrderRequest cancelOrderRequest){
+
     RefundRequest refundRequest = new RefundRequest();
-    refundRequest.setRecipientName(recipientName);
-    refundRequest.setOrderId(orderId);
-    refundRequest.setRefundAmount(this.calculateRefund());
+    refundRequest.setRecipientName(order.getRecipientName());
+    refundRequest.setOrderId(order.getId());
+    refundRequest.setRefundAmount(this.calculateRefund(order, cancelOrderRequest));
     refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
 
     return refundRequest;
+  }
+
+  private boolean isRefundFull(Date orderDate, Date cancelDate, int refundDateThreshold){
+    return dateUtils.getDateDiffInDays(orderDate, cancelDate) <= refundDateThreshold;
   }
 }
