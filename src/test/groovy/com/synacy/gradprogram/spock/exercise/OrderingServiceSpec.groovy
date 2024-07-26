@@ -33,4 +33,27 @@ class OrderingServiceSpec extends Specification {
         where:
         status << [OrderStatus.CANCELLED, OrderStatus.DELIVERED]
     }
+
+    def "cancelOrder should cancel #status orders"(){
+        given:
+        Order order = new Order()
+        order.setStatus(status)
+        UUID uuid = order.getId()
+
+        and:
+        CancelOrderRequest request = Mock()
+        request.getOrderId() >> uuid
+        orderRepository.fetchOrderById(uuid) >> Optional.of(order)
+
+        when:
+        orderingService.cancelOrder(request)
+
+        then:
+        OrderStatus.CANCELLED == order.getStatus()
+
+        where:
+        status << [OrderStatus.PENDING, OrderStatus.FOR_DELIVERY]
+    }
+
+
 }
