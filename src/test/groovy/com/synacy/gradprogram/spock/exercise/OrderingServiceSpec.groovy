@@ -22,7 +22,7 @@ class OrderingServiceSpec extends Specification {
         and:
         CancelOrderRequest request = Mock()
         request.getOrderId() >> uuid
-        orderRepository.fetchOrderById(uuid) >> order
+        orderRepository.fetchOrderById(uuid) >> Optional.of(order)
 
         when:
         orderingService.cancelOrder(request)
