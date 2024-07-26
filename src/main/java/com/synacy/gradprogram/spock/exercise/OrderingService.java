@@ -70,9 +70,6 @@ public class OrderingService {
   }
 
   public void cancelOrder(CancelOrderRequest request) {
-    // TODO: Implement me. Cancels PENDING and FOR_DELIVERY orders and create a refund request saving it to the database.
-    //  Else throws an UnableToCancelException
-
     UUID orderId = request.getOrderId();
     Order order = orderRepository.fetchOrderById(orderId).get();
 
