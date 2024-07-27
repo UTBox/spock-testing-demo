@@ -1,14 +1,17 @@
 package com.synacy.gradprogram.spock.exercise;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
 
 public class OrderingService {
 
     private final OrderRepository orderRepository;
+    private final RefundRepository refundRepository;
 
-    public OrderingService(OrderRepository orderRepository) {
+    public OrderingService(OrderRepository orderRepository, RefundRepository refundRepository) {
         this.orderRepository = orderRepository;
+        this.refundRepository = refundRepository;
     }
 
     public boolean cartContainsFoodItem(Cart cart) {
@@ -68,13 +71,20 @@ public class OrderingService {
     }
 
     public void cancelOrder(CancelOrderRequest request) {
-        // TODO: Implement me. Cancels PENDING and FOR_DELIVERY orders and create a refund request saving it to the database.
-        //  Else throws an UnableToCancelException
-
         Order order = orderRepository.fetchOrderById(request.getOrderId()).get();
         if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.FOR_DELIVERY) {
             throw new UnableToCancelException("The order cannot be cancelled because it is already processed or shipped.");
         }
 
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.saveOrder(order);
+
+        RefundRequest refundRequest = new RefundRequest();
+        refundRequest.setRecipientName(order.getRecipientName());
+        refundRequest.setOrderId(order.getId());
+        refundRequest.setRefundAmount(BigDecimal.valueOf(order.getTotalCost()));
+        refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
+
+        refundRepository.saveRefundRequest(refundRequest);
     }
 }
