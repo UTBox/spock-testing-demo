@@ -1,6 +1,7 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.util.Date;
+import java.util.Optional;
 
 public class OrderingService {
 
@@ -69,5 +70,14 @@ public class OrderingService {
   public void cancelOrder(CancelOrderRequest request) {
     // TODO: Implement me. Cancels PENDING and FOR_DELIVERY orders and create a refund request saving it to the database.
     //  Else throws an UnableToCancelException
+    Optional<Order> order = Optional
+            .ofNullable(this.orderRepository.fetchOrderById(request.getOrderId())
+                    .filter((order1 -> order1.getStatus() == OrderStatus.PENDING || order1.getStatus() == OrderStatus.FOR_DELIVERY))
+                    .orElseThrow(() -> new UnableToCancelException("Order cannot be canceled.")));
+
+    Order orderToCancel = order.get();
+
+    orderToCancel.setStatus(OrderStatus.CANCELLED);
+
   }
 }
