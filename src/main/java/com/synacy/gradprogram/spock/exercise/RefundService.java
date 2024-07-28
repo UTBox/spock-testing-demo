@@ -10,7 +10,7 @@ public class RefundService {
     return null;
   }
 
-  public void createAndSaveRefundRequest() {
+  public void createAndSaveRefundRequest(Order order) {
     // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
   }
 

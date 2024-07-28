@@ -32,7 +32,7 @@ class OrderingServiceSpec extends Specification {
         thrown(UnableToCancelException)
     }
 
-    def "cancelOrder should set #actualOrderStatus to CANCELLED if given #orderStatus from #cancelOrderRequest is PENDING or FOR_DELIVERY and call createAndSaveRefundRequest"() {
+    def "cancelOrder should set order status to CANCELLED if given #orderStatus from #cancelOrderRequest is PENDING or FOR_DELIVERY and call createAndSaveRefundRequest"() {
         given:
         Order order = new Order()
 
@@ -43,7 +43,6 @@ class OrderingServiceSpec extends Specification {
 
         cancelOrderRequest.getOrderId() >> uuid
         orderRepository.fetchOrderById(uuid) >> Optional.of(order)
-//        order.setStatus(expectedOrderStatus)
 
         when:
         orderingService.cancelOrder(cancelOrderRequest)
