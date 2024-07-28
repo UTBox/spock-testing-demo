@@ -78,6 +78,6 @@ class OrderingServiceSpec extends Specification {
 
         then:
         1 * orderRepository.saveOrder(order)
-        1 * refundService.createAndSaveRefundRequest(order, cancelOrderRequest.getReason())
+        1 * refundService.createAndSaveRefundRequest(cancelOrderRequest)
     }
 }
