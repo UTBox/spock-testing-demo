@@ -1,17 +1,17 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.UUID;
 
 public class RefundService {
 
   private final RefundRepository refundRepository;
+  private final DateUtils dateUtils;
 
-  public RefundService(RefundRepository refundRepository) {
+  public RefundService(RefundRepository refundRepository, DateUtils dateUtils) {
     this.refundRepository = refundRepository;
+    this.dateUtils = dateUtils;
   }
 
   private BigDecimal calculateRefund(Order order, CancelOrderRequest request) {
@@ -31,13 +31,9 @@ public class RefundService {
   }
 
   private Boolean isOrderCancelledWithinThreeDays(Date orderDate) {
-    DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-    
-    LocalDate orderLocalDate = LocalDate.parse(orderDate.toString(), formatter);
-    LocalDate currentLocalDate = LocalDate.now();
-    LocalDate orderLocalDatePlusThreeDays =  orderLocalDate.plusDays(3);
-    
-    if (orderLocalDatePlusThreeDays.isBefore(currentLocalDate)) {
+    Date currentDate = new Date();
+
+    if (this.dateUtils.calculateDifferenceInDays(orderDate, currentDate) > RefundConstants.MAX_DAYS_FOR_FULL_REFUND) {
       return false;
     }
     return true;
