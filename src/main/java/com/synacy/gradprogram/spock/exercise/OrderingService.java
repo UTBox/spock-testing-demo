@@ -1,17 +1,15 @@
 package com.synacy.gradprogram.spock.exercise;
 
-import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Optional;
 
 public class OrderingService {
 
     private final OrderRepository orderRepository;
-    private final RefundRepository refundRepository;
+    private final RefundService refundService;
 
-    public OrderingService(OrderRepository orderRepository, RefundRepository refundRepository) {
+    public OrderingService(OrderRepository orderRepository, RefundService refundService) {
         this.orderRepository = orderRepository;
-        this.refundRepository = refundRepository;
+        this.refundService = refundService;
     }
 
     public boolean cartContainsFoodItem(Cart cart) {
@@ -79,12 +77,6 @@ public class OrderingService {
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.saveOrder(order);
 
-        RefundRequest refundRequest = new RefundRequest();
-        refundRequest.setRecipientName(order.getRecipientName());
-        refundRequest.setOrderId(order.getId());
-        refundRequest.setRefundAmount(BigDecimal.valueOf(order.getTotalCost()));
-        refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
-
-        refundRepository.saveRefundRequest(refundRequest);
+        refundService.createAndSaveRefundRequest(order);
     }
 }

@@ -37,7 +37,7 @@ public class RefundService {
         return refundAmount.divide(BigDecimal.valueOf(2));
     }
 
-    private void createAndSaveRefundRequest(Order order) {
+    public void createAndSaveRefundRequest(Order order) {
         // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
         RefundRequest refundRequest = new RefundRequest();
 
