@@ -5,6 +5,7 @@ import com.synacy.gradprogram.spock.exercise.Order
 import com.synacy.gradprogram.spock.exercise.OrderRepository
 import com.synacy.gradprogram.spock.exercise.OrderStatus
 import com.synacy.gradprogram.spock.exercise.OrderingService
+import com.synacy.gradprogram.spock.exercise.RefundService
 import com.synacy.gradprogram.spock.exercise.UnableToCancelException
 import spock.lang.Specification
 
@@ -12,9 +13,10 @@ class OrderingServiceSpec extends Specification {
     OrderingService orderingService
 
     OrderRepository orderRepository = Mock(OrderRepository)
+    RefundService refundService = Mock(RefundService)
 
     void setup() {
-        orderingService = new OrderingService(orderRepository)
+        orderingService = new OrderingService(orderRepository, refundService)
     }
 
     def "cancelOrder should throw UnableToCancelException when OrderStatus is not PENDING or FOR_DELIVERY"() {

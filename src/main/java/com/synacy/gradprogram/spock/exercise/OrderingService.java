@@ -6,9 +6,11 @@ import java.util.Optional;
 public class OrderingService {
 
   private final OrderRepository orderRepository;
+  private final RefundService refundService;
 
-  public OrderingService(OrderRepository orderRepository) {
+  public OrderingService(OrderRepository orderRepository, RefundService refundService) {
     this.orderRepository = orderRepository;
+    this.refundService = refundService;
   }
 
   public boolean cartContainsFoodItem(Cart cart) {
@@ -76,8 +78,8 @@ public class OrderingService {
                     .orElseThrow(() -> new UnableToCancelException("Order cannot be canceled.")));
 
     Order orderToCancel = order.get();
-
     orderToCancel.setStatus(OrderStatus.CANCELLED);
 
+    this.refundService.createAndSaveRefundRequest(orderToCancel, request);
   }
 }
