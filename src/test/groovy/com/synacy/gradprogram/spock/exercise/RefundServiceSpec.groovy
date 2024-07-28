@@ -92,4 +92,24 @@ class RefundServiceSpec extends Specification {
         then:
         expectedRefundAmount == actualRefundAmount
     }
+
+    def "createAndSaveRefundRequest should create a refund request and saves the refund request to the database"() {
+        given:
+        UUID id = UUID.randomUUID()
+        Order order = Mock(Order)
+        order.recipientName >> "Muzan Kibutsuji"
+        order.id >> id
+        order.totalCost >> 100
+
+        when:
+        refundService.createAndSaveRefundRequest(order)
+
+        then:
+        1 * refundRepository.saveRefundRequest(_ as RefundRequest) >> { RefundRequest passedRequest ->
+            assert "Muzan Kibutsuji" == passedRequest.recipientName
+            assert id == passedRequest.orderId
+            assert BigDecimal.valueOf(100) == passedRequest.refundAmount
+            assert RefundRequestStatus.TO_PROCESS == passedRequest.status
+        }
+    }
 }
