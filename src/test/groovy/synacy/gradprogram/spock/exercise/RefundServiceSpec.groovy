@@ -48,7 +48,7 @@ class RefundServiceSpec extends Specification {
         this.refundService.createAndSaveRefundRequest(order, cancelRequest)
 
         then:
-        1 * this.refundRepository.saveRefundRequest(_) >> { RefundRequest refundRequest ->
+        1 * this.refundRepository.saveRefundRequest(_ as RefundRequest) >> { RefundRequest refundRequest ->
             assert refundRequest.getRecipientName() == recipientName
             assert refundRequest.getOrderId() == orderUUID
             assert refundRequest.getRefundAmount() == BigDecimal.valueOf(500.0);
@@ -83,7 +83,7 @@ class RefundServiceSpec extends Specification {
         this.refundService.createAndSaveRefundRequest(order, cancelRequest)
 
         then:
-        1 * this.refundRepository.saveRefundRequest(_) >> { RefundRequest refundRequest ->
+        1 * this.refundRepository.saveRefundRequest(_ as RefundRequest) >> { RefundRequest refundRequest ->
             assert refundRequest.getRecipientName() == recipientName
             assert refundRequest.getOrderId() == orderUUID
             assert refundRequest.getRefundAmount() == BigDecimal.valueOf(250.0);
@@ -113,7 +113,7 @@ class RefundServiceSpec extends Specification {
         this.refundService.createAndSaveRefundRequest(order, cancelRequest)
 
         then:
-        1 * this.refundRepository.saveRefundRequest(_) >> { RefundRequest refundRequest ->
+        1 * this.refundRepository.saveRefundRequest(_ as RefundRequest) >> { RefundRequest refundRequest ->
             assert refundRequest.getRecipientName() == recipientName
             assert refundRequest.getOrderId() == orderUUID
             assert refundRequest.getRefundAmount() == BigDecimal.valueOf(500.0);
