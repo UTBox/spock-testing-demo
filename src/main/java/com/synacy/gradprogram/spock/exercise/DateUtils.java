@@ -1,7 +1,4 @@
 package com.synacy.gradprogram.spock.exercise;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
