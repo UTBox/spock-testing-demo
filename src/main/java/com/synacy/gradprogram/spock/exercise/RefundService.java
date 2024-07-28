@@ -15,8 +15,6 @@ public class RefundService {
   }
 
   private BigDecimal calculateRefund(Order order, CancelOrderRequest cancelOrderRequest) {
-    // TODO: Implement me. Full refund if cancel reason is due to damaged item.
-    //  Also full refund if the order was cancelled within 3 days of order date, else refund half of the total cost.
     final double DIVISOR = 2.0;
 
     if (dateUtils.isDateWithinRefundPeriod(order.getDateOrdered()) || cancelOrderRequest.getReason() == CancelReason.DAMAGED) {
@@ -27,7 +25,6 @@ public class RefundService {
   }
 
   public void createAndSaveRefundRequest(CancelOrderRequest cancelOrderRequest) {
-    // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
     Order order = orderRepository.fetchOrderById(cancelOrderRequest.getOrderId()).get();
 
     RefundRequest refundRequest = new RefundRequest();

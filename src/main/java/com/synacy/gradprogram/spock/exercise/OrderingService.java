@@ -72,8 +72,6 @@ public class OrderingService {
   }
 
   public void cancelOrder(CancelOrderRequest request) {
-    // TODO: Implement me. Cancels PENDING and FOR_DELIVERY orders and create a refund request saving it to the database.
-    //  Else throws an UnableToCancelException
     String invalidOrderStatusMessage = "Cannot cancel order. Only PENDING or FOR_DELIVERY orders can be cancelled.";
     String orderIdNotFoundMessage = "Cannot cancel order. Order ID not found.";
 

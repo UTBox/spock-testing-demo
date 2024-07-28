@@ -14,7 +14,7 @@ class OrderingServiceSpec extends Specification {
         orderingService = new OrderingService(dateUtils ,refundService, orderRepository)
     }
 
-    def "cancelOrder should throw UnableToCancelException if #orderStatus is not PENDING or FOR_DELIVERY"() {
+    def "cancelOrder should throw UnableToCancelException if orderStatus is not PENDING or FOR_DELIVERY"() {
         given:
         Order order = Mock(Order)
         CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
@@ -33,7 +33,7 @@ class OrderingServiceSpec extends Specification {
         thrown(UnableToCancelException)
     }
 
-    def "cancelOrder should set order status to CANCELLED if OrderStatus from retrieved #order is PENDING or FOR_DELIVERY and set date cancelled to current date for #cancelOrderRequest"() {
+    def "cancelOrder should set order status to CANCELLED if OrderStatus from retrieved #order is PENDING or FOR_DELIVERY and set date cancelled to current date for cancelOrderRequest"() {
         given:
         Order order = new Order()
         CancelOrderRequest cancelOrderRequest = new CancelOrderRequest()
@@ -57,7 +57,7 @@ class OrderingServiceSpec extends Specification {
         expectedDateCancelled == cancelOrderRequest.getDateCancelled()
     }
 
-    def "cancelOrder should call saveOrder and createAndSaveRefundRequest if #validOrderStatus (PENDING or FOR_DELIVERY)"() {
+    def "cancelOrder should call saveOrder and createAndSaveRefundRequest if order status is valid (PENDING or FOR_DELIVERY)"() {
         given:
         Order order = Mock(Order)
         CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
