@@ -7,9 +7,11 @@ import java.util.concurrent.TimeUnit;
 public class RefundService {
 
     private final OrderRepository orderRepository;
+    private final RefundRepository refundRepository;
 
-    public RefundService(OrderRepository orderRepository) {
+    public RefundService(OrderRepository orderRepository, RefundRepository refundRepository) {
         this.orderRepository = orderRepository;
+        this.refundRepository = refundRepository;
     }
 
     public BigDecimal calculateRefund(RefundRequest refundRequest, CancelOrderRequest cancelOrderRequest) {
@@ -35,8 +37,16 @@ public class RefundService {
         return refundAmount.divide(BigDecimal.valueOf(2));
     }
 
-    private void createAndSaveRefundRequest() {
+    private void createAndSaveRefundRequest(Order order) {
         // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
+        RefundRequest refundRequest = new RefundRequest();
+
+        refundRequest.setRecipientName(order.getRecipientName());
+        refundRequest.setOrderId(order.getId());
+        refundRequest.setRefundAmount(BigDecimal.valueOf(order.getTotalCost()));
+        refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
+
+        refundRepository.saveRefundRequest(refundRequest);
     }
 
 }
