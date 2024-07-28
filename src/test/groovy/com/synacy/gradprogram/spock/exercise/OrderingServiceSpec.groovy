@@ -33,7 +33,7 @@ class OrderingServiceSpec extends Specification {
         thrown(UnableToCancelException)
     }
 
-    def "cancelOrder should set order status to CANCELLED if #orderStatus from #cancelOrderRequest is PENDING or FOR_DELIVERY and set #dateCancelled to current date for #cancelOrderRequest"() {
+    def "cancelOrder should set order status to CANCELLED if OrderStatus from retrieved #order is PENDING or FOR_DELIVERY and set date cancelled to current date for #cancelOrderRequest"() {
         given:
         Order order = new Order()
         CancelOrderRequest cancelOrderRequest = new CancelOrderRequest()
