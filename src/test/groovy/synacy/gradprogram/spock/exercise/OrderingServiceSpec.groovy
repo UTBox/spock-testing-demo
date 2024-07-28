@@ -19,15 +19,13 @@ class OrderingServiceSpec extends Specification {
         orderingService = new OrderingService(orderRepository, refundService)
     }
 
-    def "cancelOrder should throw UnableToCancelException when OrderStatus is not PENDING or FOR_DELIVERY"() {
+    def "cancelOrder should throw UnableToCancelException when OrderStatus is CANCELLED or DELIVERED"() {
         given:
         def cancelOrderRequest = Mock(CancelOrderRequest)
-        def orderUUID = UUID.randomUUID()
-
         cancelOrderRequest.getOrderId() >> orderUUID
 
         Order order = Mock(Order)
-        order.getStatus() >> OrderStatus.DELIVERED
+        order.getStatus() >> orderStatus
 
         this.orderRepository.fetchOrderById(orderUUID) >> Optional.ofNullable(order)
 
@@ -36,5 +34,33 @@ class OrderingServiceSpec extends Specification {
 
         then:
         thrown(UnableToCancelException)
+
+        where:
+        orderStatus | orderUUID
+        OrderStatus.CANCELLED | UUID.randomUUID()
+        OrderStatus.DELIVERED | UUID.randomUUID()
+    }
+
+    def "cancelOrder should cancel PENDING and FOR_DELIVERY orders and create a refund request"() {
+        given:
+        def cancelOrderRequest = Mock(CancelOrderRequest)
+        cancelOrderRequest.getOrderId() >> orderUUID
+
+        Order order = Mock(Order)
+        order.getStatus() >> orderStatus
+
+        this.orderRepository.fetchOrderById(orderUUID) >> Optional.ofNullable(order)
+
+        when:
+        orderingService.cancelOrder(cancelOrderRequest)
+
+        then:
+        1 * order.setStatus(OrderStatus.CANCELLED)
+        1 * this.refundService.createAndSaveRefundRequest(order, cancelOrderRequest)
+
+        where:
+        orderStatus | orderUUID
+        OrderStatus.PENDING | UUID.randomUUID()
+        OrderStatus.FOR_DELIVERY | UUID.randomUUID()
     }
 }
