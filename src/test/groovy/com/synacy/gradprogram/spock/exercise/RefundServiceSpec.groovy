@@ -6,9 +6,10 @@ class RefundServiceSpec extends Specification {
     RefundService refundService
 
     OrderRepository orderRepository = Mock(OrderRepository)
+    RefundRepository refundRepository = Mock(RefundRepository)
 
     void setup() {
-        refundService = new RefundService(orderRepository)
+        refundService = new RefundService(orderRepository, refundRepository)
     }
 
     def "calculateRefund should return full refund amount when cancel reason is due to damaged item "() {
