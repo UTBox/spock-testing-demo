@@ -27,7 +27,7 @@ public class RefundService {
       return BigDecimal.valueOf(orderTotalCost);
     }
 
-    return BigDecimal.valueOf(orderTotalCost);
+    return BigDecimal.valueOf(orderTotalCost / 2);
   }
 
   private Boolean isOrderCancelledWithinThreeDays(Date orderDate) {
