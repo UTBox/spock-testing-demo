@@ -7,34 +7,44 @@ class RefundServiceSpec extends Specification {
     RefundService refundService
 
     RefundRepository refundRepository = Mock(RefundRepository)
+    OrderRepository orderRepository = Mock(OrderRepository)
 
     void setup() {
-        refundService = new RefundService()
+        refundService = new RefundService(refundRepository, orderRepository)
     }
 
     def "createAndSaveRefundRequest should create a RefundRequest with #refundRequestStatus of TO_PROCESS and save it"() {
         given:
-        UUID uuid = UUID.randomUUID()
+        UUID expectedOrderId = UUID.randomUUID()
         String recipientName = "John Doe"
         String refundAmountString = "2500"
-        BigDecimal refundAmount = new BigDecimal(refundAmountString)
+        BigDecimal expectedRefundAmount = new BigDecimal(refundAmountString)
 
         CancelReason cancelReason = CancelReason.DAMAGED
-        RefundRequestStatus expectedRefundRequestStatus = RefundRequestStatus.TO_PROCESS
+        RefundRequestStatus expectedStatus = RefundRequestStatus.TO_PROCESS
 
         Order order = Mock(Order)
         CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
         RefundRequest refundRequest = new RefundRequest()
 
-        refundRequest.setOrderId(uuid)
+        cancelOrderRequest.getOrderId() >> expectedOrderId
+        orderRepository.fetchOrderById(expectedOrderId) >> Optional.of(order)
+        order.getRecipientName() >> recipientName
+
+        refundRequest.setOrderId(expectedOrderId)
         refundRequest.setRecipientName(recipientName)
-        refundRequest.setStatus(expectedRefundRequestStatus)
-        refundRequest.setRefundAmount(refundAmount)
+        refundRequest.setStatus(expectedStatus)
+        refundRequest.setRefundAmount(expectedRefundAmount)
 
         when:
         refundService.createAndSaveRefundRequest(cancelOrderRequest)
 
         then:
-        1 * refundRepository.saveRefundRequest(refundRequest)
+        1 * refundRepository.saveRefundRequest(_ as RefundRequest) >> { RefundRequest request ->
+            assert expectedOrderId == request.orderId
+            assert recipientName == request.recipientName
+            assert expectedRefundAmount == request.refundAmount
+            assert expectedStatus == request.status
+        }
     }
 }
