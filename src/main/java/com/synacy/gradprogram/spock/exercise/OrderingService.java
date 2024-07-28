@@ -70,6 +70,7 @@ public class OrderingService {
 
     public void cancelOrder(CancelOrderRequest request) {
         Order order = orderRepository.fetchOrderById(request.getOrderId()).get();
+
         if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.FOR_DELIVERY) {
             throw new UnableToCancelException("The order cannot be cancelled because it is already processed or shipped.");
         }

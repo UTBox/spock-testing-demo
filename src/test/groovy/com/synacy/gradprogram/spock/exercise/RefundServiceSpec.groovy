@@ -15,11 +15,12 @@ class RefundServiceSpec extends Specification {
     def "calculateRefund should return full refund amount when cancel reason is due to damaged item "() {
         given:
         RefundRequest refundRequest = Mock()
+        refundRequest.refundAmount >> BigDecimal.valueOf(100)
+
         CancelOrderRequest cancelOrderRequest = Mock()
+        cancelOrderRequest.reason >> CancelReason.DAMAGED
 
         BigDecimal expectedRefundAmount = BigDecimal.valueOf(100)
-        refundRequest.refundAmount >> BigDecimal.valueOf(100)
-        cancelOrderRequest.reason >> CancelReason.DAMAGED
 
         when:
         BigDecimal actualRefundAmount = refundService.calculateRefund(refundRequest, cancelOrderRequest)
@@ -32,7 +33,7 @@ class RefundServiceSpec extends Specification {
         given:
         UUID orderId = UUID.randomUUID()
         Order order = Mock(Order)
-        order.id >> orderId
+        orderRepository.fetchOrderById(orderId) >> Optional.of(order)
 
         and:
         Calendar calendar = Calendar.getInstance()
@@ -40,13 +41,12 @@ class RefundServiceSpec extends Specification {
         Date modifiedOrderDate = calendar.getTime()
         order.getDateOrdered() >> modifiedOrderDate
 
-        orderRepository.fetchOrderById(orderId) >> Optional.of(order)
-
         and:
         RefundRequest refundRequest = Mock(RefundRequest)
         refundRequest.orderId >> orderId
-        BigDecimal expectedRefundAmount = BigDecimal.valueOf(100)
         refundRequest.refundAmount >> BigDecimal.valueOf(100)
+
+        BigDecimal expectedRefundAmount = BigDecimal.valueOf(100)
 
         and:
         CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
@@ -65,7 +65,7 @@ class RefundServiceSpec extends Specification {
         given:
         UUID orderId = UUID.randomUUID()
         Order order = Mock(Order)
-        order.id >> orderId
+        orderRepository.fetchOrderById(orderId) >> Optional.of(order)
 
         and:
         Calendar calendar = Calendar.getInstance()
@@ -73,13 +73,12 @@ class RefundServiceSpec extends Specification {
         Date modifiedOrderDate = calendar.getTime()
         order.getDateOrdered() >> modifiedOrderDate
 
-        orderRepository.fetchOrderById(orderId) >> Optional.of(order)
-
         and:
         RefundRequest refundRequest = Mock(RefundRequest)
         refundRequest.orderId >> orderId
-        BigDecimal expectedRefundAmount = BigDecimal.valueOf(50)
-        refundRequest.refundAmount >> BigDecimal.valueOf(100)
+        refundRequest.refundAmount >> BigDecimal.valueOf(99)
+
+        BigDecimal expectedRefundAmount = BigDecimal.valueOf(49.5)
 
         and:
         CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
