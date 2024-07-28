@@ -17,7 +17,7 @@ class RefundServiceSpec extends Specification {
         CancelOrderRequest cancelOrderRequest = Mock()
 
         BigDecimal expectedRefundAmount = BigDecimal.valueOf(100)
-        refundRequest.refundAmount >> expectedRefundAmount
+        refundRequest.refundAmount >> BigDecimal.valueOf(100)
         cancelOrderRequest.reason >> CancelReason.DAMAGED
 
         when:
@@ -45,7 +45,7 @@ class RefundServiceSpec extends Specification {
         RefundRequest refundRequest = Mock(RefundRequest)
         refundRequest.orderId >> orderId
         BigDecimal expectedRefundAmount = BigDecimal.valueOf(100)
-        refundRequest.refundAmount >> expectedRefundAmount
+        refundRequest.refundAmount >> BigDecimal.valueOf(100)
 
         and:
         CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
@@ -54,9 +54,42 @@ class RefundServiceSpec extends Specification {
         cancelOrderRequest.dateCancelled >> cancelDate
 
         when:
-        BigDecimal actualRefund = refundService.calculateRefund(refundRequest, cancelOrderRequest)
+        BigDecimal actualRefundAmount = refundService.calculateRefund(refundRequest, cancelOrderRequest)
 
         then:
-        expectedRefundAmount == actualRefund
+        expectedRefundAmount == actualRefundAmount
+    }
+
+    def "calculateRefund should return half of the refund amount when cancel reason is wrong item and order is cancelled after 3 days of order date"() {
+        given:
+        UUID orderId = UUID.randomUUID()
+        Order order = Mock(Order)
+        order.id >> orderId
+
+        and:
+        Calendar calendar = Calendar.getInstance()
+        calendar.add(Calendar.DATE, - 4)
+        Date modifiedOrderDate = calendar.getTime()
+        order.getDateOrdered() >> modifiedOrderDate
+
+        orderRepository.fetchOrderById(orderId) >> Optional.of(order)
+
+        and:
+        RefundRequest refundRequest = Mock(RefundRequest)
+        refundRequest.orderId >> orderId
+        BigDecimal expectedRefundAmount = BigDecimal.valueOf(50)
+        refundRequest.refundAmount >> BigDecimal.valueOf(100)
+
+        and:
+        CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
+        cancelOrderRequest.reason >> CancelReason.WRONG_ITEM
+        Date cancelDate = new Date()
+        cancelOrderRequest.dateCancelled >> cancelDate
+
+        when:
+        BigDecimal actualRefundAmount = refundService.calculateRefund(refundRequest, cancelOrderRequest)
+
+        then:
+        expectedRefundAmount == actualRefundAmount
     }
 }
