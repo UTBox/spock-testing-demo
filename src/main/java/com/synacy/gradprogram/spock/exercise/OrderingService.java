@@ -4,9 +4,11 @@ import java.util.Date;
 
 public class OrderingService {
 
+  private final RefundService refundService;
   private final OrderRepository orderRepository;
 
-  public OrderingService(OrderRepository orderRepository) {
+  public OrderingService(RefundService refundService, OrderRepository orderRepository) {
+    this.refundService = refundService;
     this.orderRepository = orderRepository;
   }
 
