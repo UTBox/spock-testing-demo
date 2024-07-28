@@ -5,10 +5,12 @@ import java.util.Optional;
 
 public class OrderingService {
 
+  private final DateUtils dateUtils;
   private final RefundService refundService;
   private final OrderRepository orderRepository;
 
-  public OrderingService(RefundService refundService, OrderRepository orderRepository) {
+  public OrderingService(DateUtils dateUtils, RefundService refundService, OrderRepository orderRepository) {
+    this.dateUtils = dateUtils;
     this.refundService = refundService;
     this.orderRepository = orderRepository;
   }
@@ -73,7 +75,7 @@ public class OrderingService {
     // TODO: Implement me. Cancels PENDING and FOR_DELIVERY orders and create a refund request saving it to the database.
     //  Else throws an UnableToCancelException
     String invalidOrderStatusMessage = "Cannot cancel order. Only PENDING or FOR_DELIVERY orders can be cancelled.";
-    String orderIdNotFoundMessage = "Cannot cancel order. Order ID not found. ";
+    String orderIdNotFoundMessage = "Cannot cancel order. Order ID not found.";
 
     Optional<Order> optionalOrder = orderRepository.fetchOrderById(request.getOrderId());
     if (optionalOrder.isPresent()) {
@@ -83,8 +85,11 @@ public class OrderingService {
         throw new UnableToCancelException(invalidOrderStatusMessage);
       }
 
+      request.setDateCancelled(dateUtils.getCurrentDate());
       order.setStatus(OrderStatus.CANCELLED);
-      refundService.createAndSaveRefundRequest(order);
+
+      orderRepository.saveOrder(order);
+      refundService.createAndSaveRefundRequest(order, request.getReason());
       return;
     }
 

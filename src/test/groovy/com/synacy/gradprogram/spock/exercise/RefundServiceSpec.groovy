@@ -6,7 +6,7 @@ class RefundServiceSpec extends Specification {
 
 
 
-    def "calculateRefund"() {
+    def "createAndSaveRefundRequest"() {
 
     }
 }

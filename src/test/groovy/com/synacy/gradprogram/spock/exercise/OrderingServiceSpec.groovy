@@ -7,16 +7,17 @@ class OrderingServiceSpec extends Specification {
     OrderingService orderingService
 
     OrderRepository orderRepository = Mock(OrderRepository)
-    CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
     RefundService refundService = Mock(RefundService)
+    DateUtils dateUtils = Mock(DateUtils)
 
     void setup() {
-        orderingService = new OrderingService(refundService, orderRepository)
+        orderingService = new OrderingService(dateUtils ,refundService, orderRepository)
     }
 
     def "cancelOrder should throw UnableToCancelException if #orderStatus is not PENDING or FOR_DELIVERY"() {
         given:
         Order order = Mock(Order)
+        CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
 
         UUID uuid = UUID.randomUUID()
         OrderStatus orderStatus = OrderStatus.DELIVERED
@@ -32,23 +33,51 @@ class OrderingServiceSpec extends Specification {
         thrown(UnableToCancelException)
     }
 
-    def "cancelOrder should set order status to CANCELLED if given #orderStatus from #cancelOrderRequest is PENDING or FOR_DELIVERY and call createAndSaveRefundRequest"() {
+    def "cancelOrder should set order status to CANCELLED if #orderStatus from #cancelOrderRequest is PENDING or FOR_DELIVERY and set #dateCancelled to current date for #cancelOrderRequest"() {
         given:
         Order order = new Order()
+        CancelOrderRequest cancelOrderRequest = new CancelOrderRequest()
+        Date expectedDateCancelled = new Date()
 
         UUID uuid = order.getId()
-        OrderStatus orderStatus = OrderStatus.PENDING
+        cancelOrderRequest.setOrderId(uuid)
+        cancelOrderRequest.setReason(CancelReason.DAMAGED)
         OrderStatus expectedOrderStatus = OrderStatus.CANCELLED
-        order.setStatus(orderStatus)
+        OrderStatus actualOrderStatus = OrderStatus.PENDING
+        order.setStatus(actualOrderStatus)
 
-        cancelOrderRequest.getOrderId() >> uuid
         orderRepository.fetchOrderById(uuid) >> Optional.of(order)
+        dateUtils.getCurrentDate() >> expectedDateCancelled
 
         when:
         orderingService.cancelOrder(cancelOrderRequest)
 
         then:
         expectedOrderStatus == order.getStatus()
-        1 * refundService.createAndSaveRefundRequest(order)
+        expectedDateCancelled == cancelOrderRequest.getDateCancelled()
+    }
+
+    def "cancelOrder should call saveOrder and createAndSaveRefundRequest if #validOrderStatus (PENDING or FOR_DELIVERY)"() {
+        given:
+        Order order = Mock(Order)
+        CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
+
+        OrderStatus validOrderStatus = OrderStatus.PENDING
+        CancelReason givenReason = CancelReason.DAMAGED
+        Date currentDate = new Date()
+        UUID uuid = UUID.randomUUID()
+
+        cancelOrderRequest.getOrderId() >> uuid
+        orderRepository.fetchOrderById(uuid) >> Optional.of(order)
+        order.getStatus() >> validOrderStatus
+        dateUtils.getCurrentDate() >> currentDate
+        cancelOrderRequest.getReason() >> givenReason
+
+        when:
+        orderingService.cancelOrder(cancelOrderRequest)
+
+        then:
+        1 * orderRepository.saveOrder(order)
+        1 * refundService.createAndSaveRefundRequest(order, cancelOrderRequest.getReason())
     }
 }
