@@ -37,8 +37,8 @@ class OrderingServiceSpec extends Specification {
     def "cancelOrder should update the order status to cancelled and save the order when order status is valid"() {
         given:
         UUID id = UUID.randomUUID()
-        Order order = Mock(Order)
-        order.status >> orderStatus
+        Order order = new Order()
+        order.status = orderStatus
 
         orderRepository.fetchOrderById(id) >> Optional.of(order)
 
@@ -50,7 +50,9 @@ class OrderingServiceSpec extends Specification {
         orderingService.cancelOrder(cancelOrderRequest)
 
         then:
-        1 * orderRepository.saveOrder(_ as Order)
+        1 * orderRepository.saveOrder(_ as Order) >> { Order passedOrder ->
+            assert OrderStatus.CANCELLED == passedOrder.status
+        }
 
         where:
         orderStatus << [OrderStatus.PENDING, OrderStatus.FOR_DELIVERY]
