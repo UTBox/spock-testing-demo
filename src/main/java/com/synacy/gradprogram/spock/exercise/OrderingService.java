@@ -85,6 +85,7 @@ public class OrderingService {
     }
 
     order.setStatus(OrderStatus.CANCELLED);
+    orderRepository.saveOrder(order);
     refundService.createAndSaveRefundRequest(order, request);
   }
 
