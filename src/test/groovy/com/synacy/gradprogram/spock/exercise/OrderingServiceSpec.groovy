@@ -69,7 +69,9 @@ class OrderingServiceSpec extends Specification {
         orderingService.cancelOrder(request)
 
         then:
-        OrderStatus.CANCELLED == order.getStatus()
+        orderRepository.saveOrder(order) >> {Order savedOrder ->
+            OrderStatus.CANCELLED == savedOrder.getStatus()
+        }
 
         where:
         status << [OrderStatus.PENDING, OrderStatus.FOR_DELIVERY]
