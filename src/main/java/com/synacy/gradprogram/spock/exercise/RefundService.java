@@ -31,7 +31,7 @@ public class RefundService {
     refundRepository.saveRefundRequest(refundRequest);
   }
 
-  private RefundRequest createRefundRequest(Order order, CancelOrderRequest cancelOrderRequest){
+  public RefundRequest createRefundRequest(Order order, CancelOrderRequest cancelOrderRequest){
 
     RefundRequest refundRequest = new RefundRequest();
     refundRequest.setRecipientName(order.getRecipientName());
