@@ -1,17 +1,48 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class RefundService {
+  RefundRepository refundRepository;
+  DateUtils dateUtils;
 
-  public BigDecimal calculateRefund() {
-    // TODO: Implement me. Full refund if cancel reason is due to damaged item.
-    //  Also full refund if the order was cancelled within 3 days of order date, else refund half of the total cost.
-    return null;
+  public RefundService(RefundRepository refundRepository, DateUtils dateUtils){
+    this.refundRepository = refundRepository;
+    this.dateUtils = dateUtils;
   }
 
-  private void createAndSaveRefundRequest() {
-    // TODO: Implement me. Creates a TO_PROCESS refund request and saves it to the database
+  private BigDecimal calculateRefund(Order order, CancelOrderRequest cancelOrderRequest) {
+    int refundCutoffDays = 3;
+
+    if(cancelOrderRequest.getReason() == CancelReason.DAMAGED){
+      return BigDecimal.valueOf(order.getTotalCost());
+    }
+
+    if(isRefundRequestWithinCutoffDate(order.getDateOrdered(), cancelOrderRequest.getDateCancelled(), refundCutoffDays)){
+      return BigDecimal.valueOf(order.getTotalCost());
+    }
+
+    return BigDecimal.valueOf(order.getTotalCost() / 2);
   }
 
+  public void createAndSaveRefundRequest(Order order, CancelOrderRequest cancelOrderRequest) {
+    RefundRequest refundRequest = createRefundRequest(order, cancelOrderRequest);
+    refundRepository.saveRefundRequest(refundRequest);
+  }
+
+  public RefundRequest createRefundRequest(Order order, CancelOrderRequest cancelOrderRequest){
+
+    RefundRequest refundRequest = new RefundRequest();
+    refundRequest.setRecipientName(order.getRecipientName());
+    refundRequest.setOrderId(order.getId());
+    refundRequest.setRefundAmount(this.calculateRefund(order, cancelOrderRequest));
+    refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
+
+    return refundRequest;
+  }
+
+  private boolean isRefundRequestWithinCutoffDate(Date orderDate, Date cancelDate, int cutoffDays){
+    return dateUtils.getDateDiffInDays(orderDate, cancelDate) <= cutoffDays;
+  }
 }
