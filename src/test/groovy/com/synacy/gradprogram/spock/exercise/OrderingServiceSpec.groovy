@@ -13,6 +13,25 @@ class OrderingServiceSpec extends Specification {
         orderingService = new OrderingService(orderRepository, refundService)
     }
 
+    def "cancelOrder should throw an UnableToCancelException when no order is associated with the cancel order request"(){
+        given:
+        UUID uuid = UUID.randomUUID()
+        Order order = Mock()
+
+        CancelOrderRequest request = Mock()
+        request.getOrderId() >> uuid
+
+        Optional<Order> optionalOrder = Optional.of(order)
+        orderRepository.fetchOrderById(uuid) >> optionalOrder
+
+        optionalOrder.isEmpty() >> true
+
+        when:
+        orderingService.cancelOrder(request)
+
+        then:
+        thrown(UnableToCancelException)
+    }
     def "cancelOrder should throw an UnableToCancelException for orders with #status status"(){
         given:
         UUID uuid = UUID.randomUUID()
