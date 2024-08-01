@@ -1,6 +1,7 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 public class OrderingService {
@@ -71,7 +72,13 @@ public class OrderingService {
 
   public void cancelOrder(CancelOrderRequest request) {
     UUID orderId = request.getOrderId();
-    Order order = orderRepository.fetchOrderById(orderId).get();
+    Optional<Order> optionalOrder = orderRepository.fetchOrderById(orderId);
+
+    if(optionalOrder.isEmpty()){
+      throw new UnableToCancelException("Order not found");
+    }
+
+    Order order = optionalOrder.get();
 
     if(!canCancelOrder(order)){
       throw new UnableToCancelException("Order status is not eligible for cancellation");
