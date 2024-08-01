@@ -3,64 +3,64 @@ package com.synacy.gradprogram.spock.exercise;
 // TODO: Update unit tests if needed in this service's methods
 public class OrderingService {
 
-  private final OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
-  public OrderingService(OrderRepository orderRepository) {
-    this.orderRepository = orderRepository;
-  }
-
-  public boolean cartContainsFoodItem(Cart cart) {
-    for (Item item : cart.getItems()) {
-      if (item.getType() == ItemType.FOOD) {
-        return true;
-      }
+    public OrderingService(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
     }
 
-    return false;
-  }
+    public boolean cartContainsFoodItem(Cart cart) {
+        for (Item item : cart.getItems()) {
+            if (item.getType() == ItemType.FOOD) {
+                return true;
+            }
+        }
 
-  public double calculateTotalCostOfCart(Cart cart) {
-    double totalPrice = 0.0;
-
-    for (Item item : cart.getItems()) {
-      totalPrice += item.getCost();
+        return false;
     }
 
-    return totalPrice;
-  }
+    public double calculateTotalCostOfCart(Cart cart) {
+        double totalPrice = 0.0;
 
-  public boolean isCartEligibleForDiscount(Cart cart) {
-    double totalPrice = calculateTotalCostOfCart(cart);
-    double discountTotalAmountThreshold = 50.0;
-    int itemCountDiscountThreshold = 5;
+        for (Item item : cart.getItems()) {
+            totalPrice += item.getCost();
+        }
 
-    return totalPrice > discountTotalAmountThreshold
-        && cart.getItems().size() > itemCountDiscountThreshold;
-  }
-
-  public void applyDiscountToCartItems(Cart cart) {
-    double discountRate = 0.10;
-    if (isCartEligibleForDiscount(cart)) {
-      for (Item item : cart.getItems()) {
-        double discountedCost = item.getCost() * discountRate;
-        item.setCost(discountedCost);
-      }
-    }
-  }
-
-  public Order createAnOrder(Cart cart, String recipientName, String recipientAddress, boolean canContainFood) {
-    if (!canContainFood && cartContainsFoodItem(cart)) {
-      throw new UnableToCreateOrderException("Cart should not contain FOOD items");
+        return totalPrice;
     }
 
-    Order order = new Order();
-    order.setTotalCost(calculateTotalCostOfCart(cart));
-    order.setRecipientName(recipientName);
-    order.setRecipientAddress(recipientAddress);
-    order.setStatus(OrderStatus.PENDING);
+    public boolean isCartEligibleForDiscount(Cart cart) {
+        double totalPrice = calculateTotalCostOfCart(cart);
+        double discountTotalAmountThreshold = 50.0;
+        int itemCountDiscountThreshold = 5;
 
-    orderRepository.saveOrder(order);
+        return totalPrice > discountTotalAmountThreshold
+                && cart.getItems().size() > itemCountDiscountThreshold;
+    }
 
-    return order;
-  }
+    public void applyDiscountToCartItems(Cart cart) {
+        double discountRate = 0.10;
+        if (isCartEligibleForDiscount(cart)) {
+            for (Item item : cart.getItems()) {
+                double discountedCost = item.getCost() - (item.getCost() * discountRate);
+                item.setCost(discountedCost);
+            }
+        }
+    }
+
+    public Order createAnOrder(Cart cart, String recipientName, String recipientAddress, boolean canContainFood) {
+        if (!canContainFood && cartContainsFoodItem(cart)) {
+            throw new UnableToCreateOrderException("Cart should not contain FOOD items");
+        }
+
+        Order order = new Order();
+        order.setTotalCost(calculateTotalCostOfCart(cart));
+        order.setRecipientName(recipientName);
+        order.setRecipientAddress(recipientAddress);
+        order.setStatus(OrderStatus.PENDING);
+
+        orderRepository.saveOrder(order);
+
+        return order;
+    }
 }
