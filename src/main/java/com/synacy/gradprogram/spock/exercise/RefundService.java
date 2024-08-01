@@ -13,13 +13,13 @@ public class RefundService {
   }
 
   private BigDecimal calculateRefund(Order order, CancelOrderRequest cancelOrderRequest) {
-    int refundDateThreshold = 3;
+    int refundCutoffDays = 3;
 
     if(cancelOrderRequest.getReason() == CancelReason.DAMAGED){
       return BigDecimal.valueOf(order.getTotalCost());
     }
 
-    if(isRefundFull(order.getDateOrdered(), cancelOrderRequest.getDateCancelled(), refundDateThreshold)){
+    if(isRefundRequestWithinCutoffDate(order.getDateOrdered(), cancelOrderRequest.getDateCancelled(), refundCutoffDays)){
       return BigDecimal.valueOf(order.getTotalCost());
     }
 
@@ -42,7 +42,7 @@ public class RefundService {
     return refundRequest;
   }
 
-  private boolean isRefundFull(Date orderDate, Date cancelDate, int refundDateThreshold){
-    return dateUtils.getDateDiffInDays(orderDate, cancelDate) <= refundDateThreshold;
+  private boolean isRefundRequestWithinCutoffDate(Date orderDate, Date cancelDate, int cutoffDays){
+    return dateUtils.getDateDiffInDays(orderDate, cancelDate) <= cutoffDays;
   }
 }
