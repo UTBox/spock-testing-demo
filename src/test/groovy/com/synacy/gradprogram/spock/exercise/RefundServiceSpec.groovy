@@ -48,8 +48,7 @@ class RefundServiceSpec extends Specification {
         diffFromCancelToOrderDates   | cancelReason            | refundAmount | refundPolicyDesc | refundReasonDesc
         2                            | CancelReason.DAMAGED    | 100          | "full"           | "within 3 days of order date"
         5                            | CancelReason.DAMAGED    | 100          | "full"           | "beyond 3 days of order date"
-        2                            | CancelReason.WRONG_ITEM | 100          | "full"           | "within 3 days of order date"
-        5                            | CancelReason.WRONG_ITEM | 50           | "half"           | "beyond 3 days of order date"
         3                            | CancelReason.WRONG_ITEM | 100          | "full"           | "within 3 days of order date"
+        5                            | CancelReason.WRONG_ITEM | 50           | "half"           | "beyond 3 days of order date"
     }
 }
