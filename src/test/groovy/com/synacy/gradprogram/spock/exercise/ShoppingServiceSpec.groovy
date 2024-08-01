@@ -15,6 +15,18 @@ class ShoppingServiceSpec extends Specification {
                 orderRepository, deliveryRequestRepository)
     }
 
+    def "buyNonSpoilingItemsInCart should create an order for the given cart and user details"() {
+        given:
+        Cart cart = new Cart(UUID.randomUUID(), [new Item("phone", 10.0, ItemType.GADGET)])
+        User user = new User(firstName: "Sean", lastName: "Kibutsuji", address: "BGC")
+
+        when:
+        shoppingService.buyNonSpoilingItemsInCart(cart, user)
+
+        then:
+        1 * orderingService.createAnOrder(cart, "Sean Kibutsuji", "BGC", false)
+    }
+
     def "buyNonSpoilingItemsInCart should create delivery order for given cart and user details"() {
         given:
         Cart cart = Mock(Cart)
@@ -48,7 +60,7 @@ class ShoppingServiceSpec extends Specification {
         deliveryRequestRepository.fetchDeliveryRequestByOrderId(id) >> deliveryRequest
 
         when:
-        OrderSummary orderSummary =  shoppingService.getOrderSummary(id)
+        OrderSummary orderSummary = shoppingService.getOrderSummary(id)
 
         then:
         20d == orderSummary.totalCost
