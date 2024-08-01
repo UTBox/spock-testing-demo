@@ -25,7 +25,7 @@ class DateUtilsSpec extends Specification {
         where:
         olderDateRaw  | newerDateRaw   | dateDiff
         "2024-1-1"    | "2024-1-15"    | 14
-        "2024-0-1"    | "2024-2-1"     | 62
+        "2024-1-1"    | "2024-2-1"     | 31
         "2024-1-1"    | "2025-1-1"     | 366
     }
 }
