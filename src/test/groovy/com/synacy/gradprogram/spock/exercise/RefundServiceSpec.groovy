@@ -5,111 +5,62 @@ import spock.lang.Specification
 class RefundServiceSpec extends Specification {
     RefundService refundService
 
-    OrderRepository orderRepository = Mock(OrderRepository)
     RefundRepository refundRepository = Mock(RefundRepository)
 
     void setup() {
-        refundService = new RefundService(orderRepository, refundRepository)
+        refundService = new RefundService(refundRepository)
     }
 
-    def "calculateRefund should return full refund amount when cancel reason is due to damaged item "() {
+    def "createAndSaveRefundRequest should create a refund request with full refund of the order amount when cancel reason is due to damaged item "() {
         given:
-        RefundRequest refundRequest = Mock()
-        refundRequest.refundAmount >> BigDecimal.valueOf(100)
+        Order order = new Order(totalCost: 100, dateOrdered: new Date());
 
-        CancelOrderRequest cancelOrderRequest = Mock()
-        cancelOrderRequest.reason >> CancelReason.DAMAGED
+        CancelOrderRequest cancelOrderRequest = new CancelOrderRequest(reason: CancelReason.DAMAGED, dateCancelled: new Date());
 
         BigDecimal expectedRefundAmount = BigDecimal.valueOf(100)
 
         when:
-        BigDecimal actualRefundAmount = refundService.calculateRefund(refundRequest, cancelOrderRequest)
-
-        then:
-        expectedRefundAmount == actualRefundAmount
-    }
-
-    def "calculateRefund should return full refund amount when cancel reason is wrong item and order is cancelled within 3 days of order date"() {
-        given:
-        UUID orderId = UUID.randomUUID()
-        Order order = Mock(Order)
-        orderRepository.fetchOrderById(orderId) >> Optional.of(order)
-
-        and:
-        Calendar calendar = Calendar.getInstance()
-        calendar.add(Calendar.DATE, - 3)
-        Date modifiedOrderDate = calendar.getTime()
-        order.getDateOrdered() >> modifiedOrderDate
-
-        and:
-        RefundRequest refundRequest = Mock(RefundRequest)
-        refundRequest.orderId >> orderId
-        refundRequest.refundAmount >> BigDecimal.valueOf(100)
-
-        BigDecimal expectedRefundAmount = BigDecimal.valueOf(100)
-
-        and:
-        CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
-        cancelOrderRequest.reason >> CancelReason.WRONG_ITEM
-        Date cancelDate = new Date()
-        cancelOrderRequest.dateCancelled >> cancelDate
-
-        when:
-        BigDecimal actualRefundAmount = refundService.calculateRefund(refundRequest, cancelOrderRequest)
-
-        then:
-        expectedRefundAmount == actualRefundAmount
-    }
-
-    def "calculateRefund should return half of the refund amount when cancel reason is wrong item and order is cancelled after 3 days of order date"() {
-        given:
-        UUID orderId = UUID.randomUUID()
-        Order order = Mock(Order)
-        orderRepository.fetchOrderById(orderId) >> Optional.of(order)
-
-        and:
-        Calendar calendar = Calendar.getInstance()
-        calendar.add(Calendar.DATE, - 4)
-        Date modifiedOrderDate = calendar.getTime()
-        order.getDateOrdered() >> modifiedOrderDate
-
-        and:
-        RefundRequest refundRequest = Mock(RefundRequest)
-        refundRequest.orderId >> orderId
-        refundRequest.refundAmount >> BigDecimal.valueOf(99)
-
-        BigDecimal expectedRefundAmount = BigDecimal.valueOf(49.5)
-
-        and:
-        CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
-        cancelOrderRequest.reason >> CancelReason.WRONG_ITEM
-        Date cancelDate = new Date()
-        cancelOrderRequest.dateCancelled >> cancelDate
-
-        when:
-        BigDecimal actualRefundAmount = refundService.calculateRefund(refundRequest, cancelOrderRequest)
-
-        then:
-        expectedRefundAmount == actualRefundAmount
-    }
-
-    def "createAndSaveRefundRequest should create a refund request and saves the refund request to the database"() {
-        given:
-        UUID id = UUID.randomUUID()
-        Order order = Mock(Order)
-        order.recipientName >> "Muzan Kibutsuji"
-        order.id >> id
-        order.totalCost >> 100
-
-        when:
-        refundService.createAndSaveRefundRequest(order)
+        refundService.createAndSaveRefundRequest(order, cancelOrderRequest);
 
         then:
         1 * refundRepository.saveRefundRequest(_ as RefundRequest) >> { RefundRequest passedRequest ->
+            assert expectedRefundAmount == passedRequest.refundAmount
+        }
+    }
+
+    def "createAndSaveRefundRequest should create a refund request with #refundDesc when cancel reason is due to wrong item and order is cancelled #dateDesc"() {
+        given:
+        UUID orderId = UUID.randomUUID()
+        Calendar calendar = Calendar.getInstance()
+        calendar.add(Calendar.DATE, -dateDiffInDays)
+        Date modifiedDate = calendar.getTime()
+
+        and:
+        Order order = Mock(Order)
+        order.id >> orderId
+        order.recipientName >> "Muzan Kibutsuji"
+        order.totalCost >> 100
+        order.dateOrdered >> modifiedDate
+
+        and:
+        CancelOrderRequest cancelOrderRequest = Mock(CancelOrderRequest)
+        cancelOrderRequest.reason >> CancelReason.WRONG_ITEM
+        cancelOrderRequest.dateCancelled >> new Date()
+
+        when:
+        refundService.createAndSaveRefundRequest(order, cancelOrderRequest)
+
+        then:
+        1 * refundRepository.saveRefundRequest(_ as RefundRequest) >> { RefundRequest passedRequest ->
+            assert expectedRefund == passedRequest.refundAmount
+            assert orderId == passedRequest.orderId
             assert "Muzan Kibutsuji" == passedRequest.recipientName
-            assert id == passedRequest.orderId
-            assert BigDecimal.valueOf(100) == passedRequest.refundAmount
             assert RefundRequestStatus.TO_PROCESS == passedRequest.status
         }
+
+        where:
+        expectedRefund | dateDiffInDays | refundDesc                          | dateDesc
+        100            | 3              | "a full refund of the order amount" | "within 3 days of order date"
+        50             | 4              | "a refund of half the order amount" | "after 3 days of order date"
     }
 }
