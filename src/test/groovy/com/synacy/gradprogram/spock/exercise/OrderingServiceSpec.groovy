@@ -12,7 +12,22 @@ class OrderingServiceSpec extends Specification {
         orderingService = new OrderingService(orderRepository, refundService)
     }
 
-    def "cancelOrder should throw an UnableToCancelException when request order status is invalid"() {
+    def "cancelOrder should throw an OrderNotFoundException when request order id is not found"() {
+        given:
+        CancelOrderRequest cancelOrderRequest = Mock()
+        UUID id = UUID.randomUUID()
+        cancelOrderRequest.orderId >> id
+
+        orderRepository.fetchOrderById(id) >> Optional.empty()
+
+        when:
+        orderingService.cancelOrder(cancelOrderRequest)
+
+        then:
+        thrown(OrderNotFoundException)
+    }
+
+    def "cancelOrder should throw an UnableToCancelException when request order status is #orderStatusDesc"() {
         given:
         UUID id = UUID.randomUUID()
         Order order = Mock(Order)
@@ -31,7 +46,9 @@ class OrderingServiceSpec extends Specification {
         thrown(UnableToCancelException)
 
         where:
-        orderStatus << [OrderStatus.DELIVERED, OrderStatus.CANCELLED]
+        orderStatus           | orderStatusDesc
+        OrderStatus.DELIVERED | "DELIVERED"
+        OrderStatus.CANCELLED | "CANCELLED"
     }
 
     def "cancelOrder should update the order status to cancelled and save the order when order status is valid"() {
@@ -74,7 +91,7 @@ class OrderingServiceSpec extends Specification {
         orderingService.cancelOrder(cancelOrderRequest)
 
         then:
-        1 * refundService.createAndSaveRefundRequest(_ as Order)
+        1 * refundService.createAndSaveRefundRequest(order, cancelOrderRequest)
 
         where:
         orderStatus << [OrderStatus.PENDING, OrderStatus.FOR_DELIVERY]
