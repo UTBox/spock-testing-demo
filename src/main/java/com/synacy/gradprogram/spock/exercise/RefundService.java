@@ -1,49 +1,60 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class RefundService {
 
-    private final OrderRepository orderRepository;
     private final RefundRepository refundRepository;
 
-    public RefundService(OrderRepository orderRepository, RefundRepository refundRepository) {
-        this.orderRepository = orderRepository;
+    public RefundService(RefundRepository refundRepository) {
         this.refundRepository = refundRepository;
     }
 
-    public BigDecimal calculateRefund(RefundRequest refundRequest, CancelOrderRequest cancelOrderRequest) {
-        BigDecimal refundAmount = refundRequest.getRefundAmount();
-        CancelReason cancelReason = cancelOrderRequest.getReason();
-        if (cancelReason == CancelReason.DAMAGED) {
-            return refundAmount;
-        }
+    public void createAndSaveRefundRequest(Order order, CancelOrderRequest cancelOrderRequest) {
+        UUID orderId = order.getId();
+        String recipientName = order.getRecipientName();
+        BigDecimal refundAmount = calculateRefund(order, cancelOrderRequest);
 
-        Order order = orderRepository.fetchOrderById(refundRequest.getOrderId()).get();
-        Date orderDate = order.getDateOrdered();
-        Date cancelDate = cancelOrderRequest.getDateCancelled();
-
-        long dateDiffInDays = TimeUnit.DAYS.convert(
-                cancelDate.getTime() - orderDate.getTime(), TimeUnit.MILLISECONDS);
-
-        if(dateDiffInDays <= 3){
-            return refundAmount;
-        }
-
-        return refundAmount.divide(BigDecimal.valueOf(2));
+        RefundRequest refundRequest = createRefundRequest(orderId, recipientName, refundAmount);
+        refundRepository.saveRefundRequest(refundRequest);
     }
 
-    public void createAndSaveRefundRequest(Order order) {
-        RefundRequest refundRequest = new RefundRequest();
+    private BigDecimal calculateRefund(Order order, CancelOrderRequest cancelOrderRequest) {
+        double totalOrderCost = order.getTotalCost();
+        CancelReason cancelReason = cancelOrderRequest.getReason();
 
-        refundRequest.setRecipientName(order.getRecipientName());
-        refundRequest.setOrderId(order.getId());
-        refundRequest.setRefundAmount(BigDecimal.valueOf(order.getTotalCost()));
+        Date orderDate = order.getDateOrdered();
+        Date cancelDate = cancelOrderRequest.getDateCancelled();
+        long dateDiffInDays = calculateDaysBetween(orderDate, cancelDate);
+
+        if (cancelReason == CancelReason.DAMAGED || dateDiffInDays <= 3) {
+            return BigDecimal.valueOf(totalOrderCost);
+        }
+
+        return BigDecimal.valueOf(totalOrderCost / 2);
+    }
+
+    private RefundRequest createRefundRequest(UUID orderId, String recipientName, BigDecimal refundAmount) {
+        RefundRequest refundRequest = new RefundRequest();
+        refundRequest.setRecipientName(recipientName);
+        refundRequest.setOrderId(orderId);
+        refundRequest.setRefundAmount(refundAmount);
         refundRequest.setStatus(RefundRequestStatus.TO_PROCESS);
 
-        refundRepository.saveRefundRequest(refundRequest);
+        return refundRequest;
+    }
+
+    private long calculateDaysBetween(Date orderDate, Date cancelDate) {
+        LocalDate orderLocaleDate = orderDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate cancelLocaleDate = cancelDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        return ChronoUnit.DAYS.between(orderLocaleDate, cancelLocaleDate);
     }
 
 }
