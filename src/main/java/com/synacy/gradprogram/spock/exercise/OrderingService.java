@@ -1,6 +1,7 @@
 package com.synacy.gradprogram.spock.exercise;
 
 import java.util.Date;
+import java.util.Optional;
 
 public class OrderingService {
 
@@ -69,7 +70,13 @@ public class OrderingService {
     }
 
     public void cancelOrder(CancelOrderRequest request) {
-        Order order = orderRepository.fetchOrderById(request.getOrderId()).get();
+        Optional<Order> optionalOrder = orderRepository.fetchOrderById(request.getOrderId());
+
+        if (optionalOrder.isEmpty()) {
+            throw new OrderNotFoundException("Order not found for ID: " + request.getOrderId());
+        }
+
+        Order order = optionalOrder.get();
 
         if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.FOR_DELIVERY) {
             throw new UnableToCancelException("The order cannot be cancelled because it is already processed or shipped.");
@@ -78,6 +85,6 @@ public class OrderingService {
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.saveOrder(order);
 
-        refundService.createAndSaveRefundRequest(order);
+        refundService.createAndSaveRefundRequest(order, request);
     }
 }
